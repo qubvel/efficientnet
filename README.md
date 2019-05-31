@@ -1,8 +1,15 @@
 # EfficientNet-Keras
 
-This repository contains an op-for-op Keras reimplementation of EfficientNet, the new convolutional neural network architecture from [EfficientNet](https://arxiv.org/abs/1905.11946) ([TensorFlow implementation](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet)). 
+This repository contains Keras reimplementation of EfficientNet, the new convolutional neural network architecture from [EfficientNet](https://arxiv.org/abs/1905.11946) ([TensorFlow implementation](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet)). 
 
-### About EfficientNet Models
+### Table of content
+ 1. [About](#about)
+ 2. [Examples](#examples)
+ 3. [Models](#models) 
+ 4. [Installation](#installation)
+
+
+### About EfficientNet Models <a name="about"></a>
 
 If you're new to EfficientNets, here is an explanation straight from the official TensorFlow implementation: 
 
@@ -28,3 +35,41 @@ EfficientNets achieve state-of-the-art accuracy on ImageNet with an order of mag
 
 * Compared with the widely used [ResNet-50](https://arxiv.org/abs/1512.03385), EfficientNet-B4 improves the top-1 accuracy from 76.3% of ResNet-50 to 82.6% (+6.3%), under similar FLOPS constraint.
 
+### Examples <a name="about"></a>
+
+Two lines to create model:
+
+```python
+from efficientnet import EfficientNetB0
+
+model = EfficientNetB0(weights='imagenet')
+
+```
+
+Inference example [inference_example.ipynb](https://github.com/qubvel/efficientnet/blob/master/examples/inference_exmaple.ipynb)
+
+### Models <a name="models"></a>
+
+Available architectures and pretrained weights (converted from original repo):
+
+| Architecture   | @top1 | @top5 | Weights |                                              |
+|----------------|:-----:|:-----:|:-------:|
+| EfficientNetB0 |   -   |  -    |    +    | 
+| EfficientNetB1 |   -   |  -    |    +    | 
+| EfficientNetB2 |   -   |  -    |    +    |  
+| EfficientNetB3 |   -   |  -    |    +    |  
+| EfficientNetB4 |   -   |  -    |    -    |  
+| EfficientNetB5 |   -   |  -    |    -    |  
+| EfficientNetB6 |   -   |  -    |    -    |  
+| EfficientNetB7 |   -   |  -    |    -    |    
+
+
+### Installation <a name="installation"></a>
+
+Source:
+
+```bash
+git clone https://github.com/qubvel/efficientnet
+```
+
+PyPI - soon.
