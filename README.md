@@ -52,18 +52,18 @@ Inference example [inference_example.ipynb](https://github.com/qubvel/efficientn
 
 Available architectures and pretrained weights (converted from original repo):
 
-| Architecture   | @top1 | @top5 | Weights |
+| Architecture   | @top1*| @top5*| Weights |
 |----------------|:-----:|:-----:|:-------:|
-| EfficientNetB0 |   *   |  *    |    +    |
-| EfficientNetB1 |   *   |  *    |    +    |
-| EfficientNetB2 |   *   |  *    |    +    |
-| EfficientNetB3 |   *   |  *    |    +    |
+| EfficientNetB0 |0.7668 |0.9312 |    +    |
+| EfficientNetB1 |0.7863 |0.9418 |    +    |
+| EfficientNetB2 |0.7968 |0.9475 |    +    |
+| EfficientNetB3 |0.8083 |0.9531 |    +    |
 | EfficientNetB4 |   -   |  -    |    -    |
 | EfficientNetB5 |   -   |  -    |    -    |
 | EfficientNetB6 |   -   |  -    |    -    |
 | EfficientNetB7 |   -   |  -    |    -    |
 
-"*" - validation on progress
+"*" - topK accuracy score for converted models (imagenet `val` set)
 
 ### Installation <a name="installation"></a>
 
