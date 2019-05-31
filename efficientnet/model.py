@@ -282,23 +282,22 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True):
             x = MBConvBlock(block_args, global_params)(x)
 
     # Head part
+    x = KL.Conv2D(
+        filters=round_filters(1280, global_params),
+        kernel_size=[1, 1],
+        strides=[1, 1],
+        kernel_initializer=conv_kernel_initializer,
+        padding='same',
+        use_bias=False
+    )(x)
+    x = KL.BatchNormalization(
+        axis=channel_axis,
+        momentum=batch_norm_momentum,
+        epsilon=batch_norm_epsilon
+    )(x)
+    x = Swish()(x)
+
     if include_top:
-
-        x = KL.Conv2D(
-            filters=round_filters(1280, global_params),
-            kernel_size=[1, 1],
-            strides=[1, 1],
-            kernel_initializer=conv_kernel_initializer,
-            padding='same',
-            use_bias=False
-        )(x)
-        x = KL.BatchNormalization(
-            axis=channel_axis,
-            momentum=batch_norm_momentum,
-            epsilon=batch_norm_epsilon
-        )(x)
-        x = Swish()(x)
-
         x = KL.GlobalAveragePooling2D(data_format=global_params.data_format)(x)
         if global_params.dropout_rate > 0:
             x = KL.Dropout(global_params.dropout_rate)(x)

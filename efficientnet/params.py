@@ -11,10 +11,22 @@ IMAGENET_WEIGHTS = {
         'md5': 'bca04d16b1b8a7c607b1152fe9261af7',
     },
 
+    'efficientnet-b0-notop': {
+        'name': 'efficientnet-b0_imagenet_1000_notop.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b0_imagenet_1000_notop.h5',
+        'md5': '45d2f3b6330c2401ef66da3961cad769',
+    },
+
     'efficientnet-b1': {
         'name': 'efficientnet-b1_imagenet_1000.h5',
         'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b1_imagenet_1000.h5',
         'md5': 'bd4a2b82f6f6bada74fc754553c464fc',
+    },
+
+    'efficientnet-b1-notop': {
+        'name': 'efficientnet-b1_imagenet_1000_notop.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b1_imagenet_1000_notop.h5',
+        'md5': '884aed586c2d8ca8dd15a605ec42f564',
     },
 
     'efficientnet-b2': {
@@ -23,11 +35,23 @@ IMAGENET_WEIGHTS = {
         'md5': '45b28b26f15958bac270ab527a376999',
     },
 
+    'efficientnet-b2-notop': {
+        'name': 'efficientnet-b2_imagenet_1000_notop.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b2_imagenet_1000_notop.h5',
+        'md5': '42fb9f2d9243d461d62b4555d3a53b7b',
+    },
+
     'efficientnet-b3': {
         'name': 'efficientnet-b3_imagenet_1000.h5',
         'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b3_imagenet_1000.h5',
         'md5': 'decd2c8a23971734f9d3f6b4053bf424',
-    }
+    },
+
+    'efficientnet-b3-notop': {
+        'name': 'efficientnet-b3_imagenet_1000_notop.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b3_imagenet_1000_notop.h5',
+        'md5': '1f7d9a8c2469d2e3d3b97680d45df1e1',
+    },
 
 }
 
