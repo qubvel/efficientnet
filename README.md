@@ -3,7 +3,7 @@
 This repository contains Keras reimplementation of EfficientNet, the new convolutional neural network architecture from [EfficientNet](https://arxiv.org/abs/1905.11946) ([TensorFlow implementation](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet)). 
 
 ### Table of content
- 1. [About](#about)
+ 1. [About EfficientNets](#about)
  2. [Examples](#examples)
  3. [Models](#models) 
  4. [Installation](#installation)
@@ -35,7 +35,7 @@ EfficientNets achieve state-of-the-art accuracy on ImageNet with an order of mag
 
 * Compared with the widely used [ResNet-50](https://arxiv.org/abs/1512.03385), EfficientNet-B4 improves the top-1 accuracy from 76.3% of ResNet-50 to 82.6% (+6.3%), under similar FLOPS constraint.
 
-### Examples <a name="about"></a>
+### Examples <a name="examples"></a>
 
 Two lines to create model:
 
@@ -54,15 +54,16 @@ Available architectures and pretrained weights (converted from original repo):
 
 | Architecture   | @top1 | @top5 | Weights |
 |----------------|:-----:|:-----:|:-------:|
-| EfficientNetB0 |   -   |  -    |    +    |
-| EfficientNetB1 |   -   |  -    |    +    |
-| EfficientNetB2 |   -   |  -    |    +    |
-| EfficientNetB3 |   -   |  -    |    +    |
+| EfficientNetB0 |   *   |  *    |    +    |
+| EfficientNetB1 |   *   |  *    |    +    |
+| EfficientNetB2 |   *   |  *    |    +    |
+| EfficientNetB3 |   *   |  *    |    +    |
 | EfficientNetB4 |   -   |  -    |    -    |
 | EfficientNetB5 |   -   |  -    |    -    |
 | EfficientNetB6 |   -   |  -    |    -    |
 | EfficientNetB7 |   -   |  -    |    -    |
 
+"*" - validation on progress
 
 ### Installation <a name="installation"></a>
 
