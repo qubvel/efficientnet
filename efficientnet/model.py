@@ -38,8 +38,8 @@ from keras.utils import get_file
 from .layers import Swish, DropConnect
 from .params import get_model_params, IMAGENET_WEIGHTS
 
-
-__all__ = ['EfficientNet', 'EfficientNetB0', 'EfficientNetB1', 'EfficientNetB2', 'EfficientNetB3']
+__all__ = ['EfficientNet', 'EfficientNetB0', 'EfficientNetB1', 'EfficientNetB2', 'EfficientNetB3',
+           'EfficientNetB4', 'EfficientNetB5', 'EfficientNetB6', 'EfficientNetB7']
 
 
 def conv_kernel_initializer(shape, dtype=K.floatx(), partition_info=None):
@@ -102,7 +102,7 @@ def round_filters(filters, global_params):
     # Make sure that round down does not go down by more than 10%.
     if new_filters < 0.9 * filters:
         new_filters += divisor
-    #print('round_filter input={} output={}'.format(orig_f, new_filters))
+    # print('round_filter input={} output={}'.format(orig_f, new_filters))
     return int(new_filters)
 
 
@@ -312,7 +312,33 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True):
 
 
 def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=None, classes=1000):
+    """Re-Implementation of EfficientNet for Keras
 
+    Reference:
+        https://arxiv.org/abs/1807.11626
+
+    Args:
+        input_shape: optional, if ``None`` default_input_shape is used
+            EfficientNetB0 - (224, 224, 3)
+            EfficientNetB1 - (240, 240, 3)
+            EfficientNetB2 - (260, 260, 3)
+            EfficientNetB3 - (300, 300, 3)
+            EfficientNetB4 - (380, 380, 3)
+            EfficientNetB5 - (456, 456, 3)
+            EfficientNetB6 - (528, 528, 3)
+            EfficientNetB7 - (600, 600, 3)
+        include_top: whether to include the fully-connected
+            layer at the top of the network.
+        weights: one of `None` (random initialization),
+              'imagenet' (pre-training on ImageNet).
+        classes: optional number of classes to classify images
+            into, only to be specified if `include_top` is True, and
+            if no `weights` argument is specified.
+
+    Returns:
+        A Keras model instance.
+
+    """
     if weights not in {None, 'imagenet'}:
         raise ValueError('Parameter `weights` should be one of [None, "imagenet"]')
 
@@ -388,3 +414,13 @@ def EfficientNetB6(include_top=True, input_shape=None, weights=None, classes=100
 def EfficientNetB7(include_top=True, input_shape=None, weights=None, classes=1000):
     return _get_model_by_name('efficientnet-b7', include_top=include_top, input_shape=input_shape,
                               weights=weights)
+
+
+EfficientNetB0.__doc__ = _get_model_by_name.__doc__
+EfficientNetB1.__doc__ = _get_model_by_name.__doc__
+EfficientNetB2.__doc__ = _get_model_by_name.__doc__
+EfficientNetB3.__doc__ = _get_model_by_name.__doc__
+EfficientNetB4.__doc__ = _get_model_by_name.__doc__
+EfficientNetB5.__doc__ = _get_model_by_name.__doc__
+EfficientNetB6.__doc__ = _get_model_by_name.__doc__
+EfficientNetB7.__doc__ = _get_model_by_name.__doc__
