@@ -36,20 +36,11 @@ import keras.layers as KL
 from keras.utils import get_file
 
 from .layers import Swish, DropConnect
-from .params import get_model_params
+from .params import get_model_params, IMAGENET_WEIGHTS
+
 
 __all__ = ['EfficientNet', 'EfficientNetB0', 'EfficientNetB1', 'EfficientNetB2', 'EfficientNetB3']
 
-
-IMAGENET_WEIGHTS = {
-
-    'efficientnet-b0': {
-        'name': 'efficientnet-b0_imagenet_1000.h5',
-        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b0_imagenet_1000.h5',
-        'md5': ''
-    }
-
-}
 
 def conv_kernel_initializer(shape, dtype=K.floatx(), partition_info=None):
     """Initialization for convolutional kernels.
@@ -111,7 +102,7 @@ def round_filters(filters, global_params):
     # Make sure that round down does not go down by more than 10%.
     if new_filters < 0.9 * filters:
         new_filters += divisor
-    print('round_filter input={} output={}'.format(orig_f, new_filters))
+    #print('round_filter input={} output={}'.format(orig_f, new_filters))
     return int(new_filters)
 
 
