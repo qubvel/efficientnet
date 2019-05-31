@@ -34,7 +34,7 @@ class DropConnect(KL.Layer):
 
     def get_config(self):
         config = super().get_config()
-        config['drop_connect_rate'] = drop_connect_rate
+        config['drop_connect_rate'] = self.drop_connect_rate
 
 
 get_custom_objects().update({
