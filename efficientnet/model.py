@@ -408,12 +408,12 @@ def EfficientNetB5(include_top=True, input_shape=None, weights=None, classes=100
 
 def EfficientNetB6(include_top=True, input_shape=None, weights=None, classes=1000):
     return _get_model_by_name('efficientnet-b6', include_top=include_top, input_shape=input_shape,
-                              weights=weights)
+                              weights=weights, classes=classes)
 
 
 def EfficientNetB7(include_top=True, input_shape=None, weights=None, classes=1000):
     return _get_model_by_name('efficientnet-b7', include_top=include_top, input_shape=input_shape,
-                              weights=weights)
+                              weights=weights, classes=classes)
 
 
 EfficientNetB0.__doc__ = _get_model_by_name.__doc__
