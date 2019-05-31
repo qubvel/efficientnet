@@ -63,7 +63,9 @@ Available architectures and pretrained weights (converted from original repo):
 | EfficientNetB6 |   -   |  -    |    -    |
 | EfficientNetB7 |   -   |  -    |    -    |
 
-"*" - topK accuracy score for converted models (imagenet `val` set)
+"*" - topK accuracy score for converted models (imagenet `val` set) 
+ 
+Weights for B4-B7 are not released yet ([issue](https://github.com/tensorflow/tpu/issues/377)).
 
 ### Installation <a name="installation"></a>
 
