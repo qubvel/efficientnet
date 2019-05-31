@@ -355,7 +355,7 @@ def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=N
     if input_shape is None:
         input_shape = (default_input_shape, default_input_shape, 3)
 
-    model = EfficientNet(input_shape, block_agrs_list, global_params)
+    model = EfficientNet(input_shape, block_agrs_list, global_params, include_top=include_top)
     model.name = model_name
 
     if weights:
