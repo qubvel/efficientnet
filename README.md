@@ -72,7 +72,7 @@ Weights for B4-B7 are not released yet ([issue](https://github.com/tensorflow/tp
 Source:
 
 ```bash
-git clone https://github.com/qubvel/efficientnet
+pip install git+https://github.com/qubvel/efficientnet
 ```
 
 PyPI - soon.
