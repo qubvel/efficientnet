@@ -69,10 +69,18 @@ Weights for B4-B7 are not released yet ([issue](https://github.com/tensorflow/tp
 
 ### Installation <a name="installation"></a>
 
+Requirements:
+ - keras >= 2.2.0 (tensorflow)
+ - scikit-image
+
 Source:
 
 ```bash
-pip install git+https://github.com/qubvel/efficientnet
+$ pip install git+https://github.com/qubvel/efficientnet
 ```
 
-PyPI - soon.
+PyPI:
+
+```bash
+$ pip install efficientnet
+```
