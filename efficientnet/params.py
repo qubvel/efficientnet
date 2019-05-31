@@ -2,6 +2,36 @@ import os
 import re
 import collections
 
+
+IMAGENET_WEIGHTS = {
+
+    'efficientnet-b0': {
+        'name': 'efficientnet-b0_imagenet_1000.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b0_imagenet_1000.h5',
+        'md5': 'bca04d16b1b8a7c607b1152fe9261af7',
+    },
+
+    'efficientnet-b1': {
+        'name': 'efficientnet-b1_imagenet_1000.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b1_imagenet_1000.h5',
+        'md5': 'bd4a2b82f6f6bada74fc754553c464fc',
+    },
+
+    'efficientnet-b2': {
+        'name': 'efficientnet-b2_imagenet_1000.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b2_imagenet_1000.h5',
+        'md5': '45b28b26f15958bac270ab527a376999',
+    },
+
+    'efficientnet-b3': {
+        'name': 'efficientnet-b3_imagenet_1000.h5',
+        'url': 'https://github.com/qubvel/efficientnet/releases/download/v0.0.1/efficientnet-b3_imagenet_1000.h5',
+        'md5': 'decd2c8a23971734f9d3f6b4053bf424',
+    }
+
+}
+
+
 GlobalParams = collections.namedtuple('GlobalParams', [
     'batch_norm_momentum', 'batch_norm_epsilon', 'dropout_rate', 'data_format',
     'num_classes', 'width_coefficient', 'depth_coefficient',
@@ -147,6 +177,6 @@ def get_model_params(model_name, override_params=None):
     # in global_params.
     global_params = global_params._replace(**override_params)
 
-  print('global_params= %s', global_params)
-  print('blocks_args= %s', blocks_args)
+  #print('global_params= %s', global_params)
+  #print('blocks_args= %s', blocks_args)
   return blocks_args, global_params, input_shape
