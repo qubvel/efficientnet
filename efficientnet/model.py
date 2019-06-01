@@ -228,8 +228,8 @@ def MBConvBlock(block_args, global_params):
                     s == 1 for s in block_args.strides
             ) and block_args.input_filters == block_args.output_filters:
                 # only apply drop_connect if skip presents.
-                if global_params.drop_connect_rate:
-                    x = DropConnect(global_params.drop_connect_rate)(x)
+                # if global_params.drop_connect_rate:
+                #     x = DropConnect(global_params.drop_connect_rate)(x)
                 x = KL.Add()([x, inputs])
         return x
 
