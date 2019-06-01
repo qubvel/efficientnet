@@ -76,7 +76,7 @@ Requirements:
 Source:
 
 ```bash
-$ pip install git+https://github.com/qubvel/efficientnet
+$ pip install git+https://github.com/mattiavarile/efficientnet
 ```
 
 PyPI:
