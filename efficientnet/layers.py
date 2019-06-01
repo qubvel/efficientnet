@@ -7,7 +7,8 @@ from tensorflow.python.ops import nn_impl
 class Swish(KL.Layer):
 
     def call(self, inputs):
-        return nn_impl.swish(inputs)
+        return (K.sigmoid(inputs) * inputs)
+        #return nn_impl.swish(inputs)
 
 
 class DropConnect(KL.Layer):
