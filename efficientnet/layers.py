@@ -1,7 +1,7 @@
 import tensorflow as tf
 import tensorflow.keras.backend as K
 import tensorflow.keras.layers as KL
-from tensorflow.keras.utils.generic_utils import get_custom_objects
+from tensorflow.python.keras.utils.generic_utils import get_custom_objects
 
 
 class Swish(KL.Layer):
