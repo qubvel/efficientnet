@@ -110,7 +110,7 @@ def SEBlock(block_args, global_params):
     return block
 
 
-def MBConvBlock(block_args, global_params):
+def MBConvBlock(block_args, global_params, drop_connect_rate=None):
     batch_norm_momentum = global_params.batch_norm_momentum
     batch_norm_epsilon = global_params.batch_norm_epsilon
 
@@ -185,8 +185,8 @@ def MBConvBlock(block_args, global_params):
                     s == 1 for s in block_args.strides
             ) and block_args.input_filters == block_args.output_filters:
                 # only apply drop_connect if skip presents.
-                if global_params.drop_connect_rate:
-                   x = DropConnect(global_params.drop_connect_rate)(x)
+                if drop_connect_rate:
+                    x = DropConnect(drop_connect_rate)(x)
                 x = KL.Add()([x, inputs])
         return x
 
@@ -220,6 +220,11 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True):
     x = Swish()(x)
 
     # Blocks part
+    block_idx = 1
+    n_blocks = sum([block_args.num_repeat for block_args in block_args_list])
+    drop_rate = global_params.drop_connect_rate or 0
+    drop_rate_dx = drop_rate / n_blocks
+
     for block_args in block_args_list:
         assert block_args.num_repeat > 0
         # Update block input and output filters based on depth multiplier.
@@ -230,13 +235,17 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True):
         )
 
         # The first block needs to take care of stride and filter size increase.
-        x = MBConvBlock(block_args, global_params)(x)
+        x = MBConvBlock(block_args, global_params,
+                        drop_connect_rate=drop_rate_dx * block_idx)(x)
+        block_idx += 1
 
         if block_args.num_repeat > 1:
             block_args = block_args._replace(input_filters=block_args.output_filters, strides=[1, 1])
 
         for _ in xrange(block_args.num_repeat - 1):
-            x = MBConvBlock(block_args, global_params)(x)
+            x = MBConvBlock(block_args, global_params,
+                            drop_connect_rate=drop_rate_dx * block_idx)(x)
+            block_idx += 1
 
     # Head part
     x = KL.Conv2D(
