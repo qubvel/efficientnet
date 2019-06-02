@@ -37,7 +37,7 @@ EfficientNets achieve state-of-the-art accuracy on ImageNet with an order of mag
 
 ### Examples <a name="examples"></a>
 
-Two lines to create model:
+ - Two lines to create model:
 
 ```python
 from efficientnet import EfficientNetB0
@@ -46,7 +46,16 @@ model = EfficientNetB0(weights='imagenet')
 
 ```
 
-Inference example [inference_example.ipynb](https://github.com/qubvel/efficientnet/blob/master/examples/inference_exmaple.ipynb)
+ - Inference example:  
+ [inference_example.ipynb](https://github.com/qubvel/efficientnet/blob/master/examples/inference_exmaple.ipynb)
+
+ - Loading saved model:
+ 
+```python
+from efficinetnet import load_model
+
+model = load_model('path/to/model.h5')
+```
 
 ### Models <a name="models"></a>
 
