@@ -52,7 +52,7 @@ model = EfficientNetB0(weights='imagenet')
  - Loading saved model:
  
 ```python
-from efficinetnet import load_model
+from efficientnet import load_model
 
 model = load_model('path/to/model.h5')
 ```
