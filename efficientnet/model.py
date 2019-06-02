@@ -37,54 +37,11 @@ from keras.utils import get_file
 
 from .layers import Swish, DropConnect
 from .params import get_model_params, IMAGENET_WEIGHTS
+from .initializers import conv_kernel_initializer, dense_kernel_initializer
+
 
 __all__ = ['EfficientNet', 'EfficientNetB0', 'EfficientNetB1', 'EfficientNetB2', 'EfficientNetB3',
            'EfficientNetB4', 'EfficientNetB5', 'EfficientNetB6', 'EfficientNetB7']
-
-
-def conv_kernel_initializer(shape, dtype=K.floatx(), partition_info=None):
-    """Initialization for convolutional kernels.
-
-    The main difference with tf.variance_scaling_initializer is that
-    tf.variance_scaling_initializer uses a truncated normal with an uncorrected
-    standard deviation, whereas here we use a normal distribution. Similarly,
-    tf.contrib.layers.variance_scaling_initializer uses a truncated normal with
-    a corrected standard deviation.
-
-    Args:
-      shape: shape of variable
-      dtype: dtype of variable
-      partition_info: unused
-
-    Returns:
-      an initialization for the variable
-    """
-    del partition_info
-    kernel_height, kernel_width, _, out_filters = shape
-    fan_out = int(kernel_height * kernel_width * out_filters)
-    return tf.random_normal(
-        shape, mean=0.0, stddev=np.sqrt(2.0 / fan_out), dtype=dtype)
-
-
-def dense_kernel_initializer(shape, dtype=K.floatx(), partition_info=None):
-    """Initialization for dense kernels.
-
-    This initialization is equal to
-      tf.variance_scaling_initializer(scale=1.0/3.0, mode='fan_out',
-                                      distribution='uniform').
-    It is written out explicitly here for clarity.
-
-    Args:
-      shape: shape of variable
-      dtype: dtype of variable
-      partition_info: unused
-
-    Returns:
-      an initialization for the variable
-    """
-    del partition_info
-    init_range = 1.0 / np.sqrt(shape[1])
-    return tf.random_uniform(shape, -init_range, init_range, dtype=dtype)
 
 
 def round_filters(filters, global_params):
@@ -229,7 +186,7 @@ def MBConvBlock(block_args, global_params):
             ) and block_args.input_filters == block_args.output_filters:
                 # only apply drop_connect if skip presents.
                 if global_params.drop_connect_rate:
-                    x = DropConnect(global_params.drop_connect_rate)(x)
+                   x = DropConnect(global_params.drop_connect_rate)(x)
                 x = KL.Add()([x, inputs])
         return x
 
