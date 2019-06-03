@@ -193,7 +193,7 @@ def MBConvBlock(block_args, global_params, drop_connect_rate=None):
     return block
 
 
-def EfficientNet(input_shape, block_args_list, global_params, include_top=True):
+def EfficientNet(input_shape, block_args_list, global_params, include_top=True, pooling=None):
     batch_norm_momentum = global_params.batch_norm_momentum
     batch_norm_epsilon = global_params.batch_norm_epsilon
     if global_params.data_format == 'channels_first':
@@ -269,6 +269,11 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True):
             x = KL.Dropout(global_params.dropout_rate)(x)
         x = KL.Dense(global_params.num_classes, kernel_initializer=dense_kernel_initializer)(x)
         x = KL.Activation('softmax')(x)
+    else:
+        if pooling == 'avg':
+            x = KL.GlobalAveragePooling2D(data_format=global_params.data_format)(x)
+        elif pooling == 'max':
+            x = KL.GlobalMaxPooling2D(data_format=global_params.data_format)(x)
 
     outputs = x
     model = KM.Model(inputs, outputs)
@@ -276,7 +281,7 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True):
     return model
 
 
-def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=None, classes=1000):
+def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=None, classes=1000, pooling=None):
     """Re-Implementation of EfficientNet for Keras
 
     Reference:
@@ -321,7 +326,7 @@ def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=N
     if input_shape is None:
         input_shape = (default_input_shape, default_input_shape, 3)
 
-    model = EfficientNet(input_shape, block_agrs_list, global_params, include_top=include_top)
+    model = EfficientNet(input_shape, block_agrs_list, global_params, include_top=include_top, pooling=pooling)
     model.name = model_name
 
     if weights:
@@ -341,44 +346,44 @@ def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=N
     return model
 
 
-def EfficientNetB0(include_top=True, input_shape=None, weights=None, classes=1000):
+def EfficientNetB0(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
     return _get_model_by_name('efficientnet-b0', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes)
+                              weights=weights, classes=classes, pooling=pooling)
 
 
-def EfficientNetB1(include_top=True, input_shape=None, weights=None, classes=1000):
+def EfficientNetB1(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
     return _get_model_by_name('efficientnet-b1', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes)
+                              weights=weights, classes=classes, pooling=pooling)
 
 
-def EfficientNetB2(include_top=True, input_shape=None, weights=None, classes=1000):
+def EfficientNetB2(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
     return _get_model_by_name('efficientnet-b2', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes)
+                              weights=weights, classes=classes, pooling=pooling)
 
 
-def EfficientNetB3(include_top=True, input_shape=None, weights=None, classes=1000):
+def EfficientNetB3(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
     return _get_model_by_name('efficientnet-b3', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes)
+                              weights=weights, classes=classes, pooling=pooling)
 
 
-def EfficientNetB4(include_top=True, input_shape=None, weights=None, classes=1000):
+def EfficientNetB4(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
     return _get_model_by_name('efficientnet-b4', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes)
+                              weights=weights, classes=classes, pooling=pooling)
 
 
-def EfficientNetB5(include_top=True, input_shape=None, weights=None, classes=1000):
+def EfficientNetB5(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
     return _get_model_by_name('efficientnet-b5', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes)
+                              weights=weights, classes=classes, pooling=pooling)
 
 
-def EfficientNetB6(include_top=True, input_shape=None, weights=None, classes=1000):
+def EfficientNetB6(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
     return _get_model_by_name('efficientnet-b6', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes)
+                              weights=weights, classes=classes, pooling=pooling)
 
 
-def EfficientNetB7(include_top=True, input_shape=None, weights=None, classes=1000):
+def EfficientNetB7(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
     return _get_model_by_name('efficientnet-b7', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes)
+                              weights=weights, classes=classes, pooling=pooling)
 
 
 EfficientNetB0.__doc__ = _get_model_by_name.__doc__
