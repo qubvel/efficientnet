@@ -304,6 +304,10 @@ def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=N
         classes: optional number of classes to classify images
             into, only to be specified if `include_top` is True, and
             if no `weights` argument is specified.
+        pooling: optional [None, 'avg', 'max'], if ``include_top=False``
+            add global pooling on top of the network
+            - avg: GlobalAveragePooling2D
+            - max: GlobalMaxPooling2D
 
     Returns:
         A Keras model instance.

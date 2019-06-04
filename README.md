@@ -85,11 +85,11 @@ Requirements:
 Source:
 
 ```bash
-$ pip install git+https://github.com/qubvel/efficientnet
+$ pip install -U git+https://github.com/qubvel/efficientnet
 ```
 
 PyPI:
 
 ```bash
-$ pip install efficientnet
+$ pip install -U efficientnet
 ```
