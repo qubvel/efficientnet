@@ -1,9 +1,9 @@
 import numpy as np
 import tensorflow as tf
-import keras.backend as K
+import tensorflow.keras.backend as K
 
-from keras.initializers import Initializer
-from keras.utils.generic_utils import get_custom_objects
+from tensorflow.keras.initializers import Initializer
+from tensorflow.python.keras.utils.generic_utils import get_custom_objects
 
 
 class EfficientConv2DKernelInitializer(Initializer):
