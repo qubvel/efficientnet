@@ -2,13 +2,11 @@ import tensorflow as tf
 import tensorflow.keras.backend as K
 import tensorflow.keras.layers as KL
 from tensorflow.python.keras.utils.generic_utils import get_custom_objects
-from tensorflow.python.ops import nn_impl
 
 class Swish(KL.Layer):
 
     def call(self, inputs):
         return (K.sigmoid(inputs) * inputs)
-        #return nn_impl.swish(inputs)
 
 
 class DropConnect(KL.Layer):
