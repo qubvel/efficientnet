@@ -11,8 +11,8 @@ class Swish(KL.Layer):
 
 class DropConnect(KL.Layer):
 
-    def __init__(self, drop_connect_rate=0.):
-        super().__init__()
+    def __init__(self, drop_connect_rate=0., **kwargs):
+        super().__init__(**kwargs)
         self.drop_connect_rate = drop_connect_rate
 
     def call(self, inputs, training=None):

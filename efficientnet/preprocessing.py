@@ -35,7 +35,7 @@ def center_crop_and_resize(image, image_size, crop_padding=32, interpolation='bi
 
 
 def preprocess_input(x):
-    assert x.ndim == 3
+    assert x.ndim in (3, 4)
     assert x.shape[-1] == 3
 
     x = x - np.array(MEAN_RGB)
