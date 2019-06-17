@@ -10,6 +10,7 @@ The codebase is heavily inspired by the [TensorFlow implementation](https://gith
  2. [Examples](#examples)
  3. [Models](#models)
  4. [Installation](#installation)
+ 5. [Utilities](#utilities)
 
 
 ## About EfficientNet Models
@@ -73,7 +74,6 @@ The performance of each model variant using the pre-trained weights converted fr
 
 **\*** - topK accuracy score for converted models (imagenet `val` set)
 
-**Note**: *Weights for B6-B7 have not been made available yet, but might appear soon. Follow the [issue](https://github.com/tensorflow/tpu/issues/377) for updates).*
 
 ## Installation
 
@@ -93,3 +93,17 @@ pip install -U git+https://github.com/qubvel/efficientnet
 ```bash
 pip install -U efficientnet
 ```
+
+## FAQ
+
+* **How can I convert the original TensorFlow checkpoints to Keras HDF5?**
+
+Pick the target directory (like `dist`) and run the [converter script](./scripts) as follows:
+
+```bash
+./scripts/convert_efficientnet.sh dist
+```
+
+* **Why are B6 and B7 model variants not yet supported?**
+
+Weights for B6-B7 have not been made available yet, but might appear soon. Follow the [issue](https://github.com/tensorflow/tpu/issues/377) for updates.
