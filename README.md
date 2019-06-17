@@ -1,6 +1,7 @@
 # EfficientNet-Keras
 
-This repository contains a Keras reimplementation of **EfficientNet**, a state-of-the-art convolutional neural network architecture [achieving higher accuracy and efficiency](https://arxiv.org/abs/1905.11946) than other ConvNets.
+This repository contains a Keras reimplementation of **EfficientNet**, a lightweight convolutional neural network architecture achieving the [state-of-the-art accuracy with an order of magnitude fewer parameters and FLOPS](https://arxiv.org/abs/1905.11946), on both ImageNet and
+five other commonly used transfer learning datasets.
 
 The codebase is heavily inspired by the [TensorFlow implementation](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet).
 
@@ -30,11 +31,11 @@ EfficientNets rely on AutoML and compound scaling to achieve superior performanc
 
 EfficientNets achieve state-of-the-art accuracy on ImageNet with an order of magnitude better efficiency:
 
-* In high-accuracy regime, EfficientNet-B7 achieves state-of-the-art 84.4% top-1 / 97.1% top-5 accuracy on ImageNet with 66M parameters and 37B FLOPS, being 8.4x smaller and 6.1x faster on CPU inference than previous best [Gpipe](https://arxiv.org/abs/1811.06965).
+* In high-accuracy regime, EfficientNet-B7 achieves the state-of-the-art 84.4% top-1 / 97.1% top-5 accuracy on ImageNet with 66M parameters and 37B FLOPS. At the same time, the model is 8.4x smaller and 6.1x faster on CPU inference than the former leader, [Gpipe](https://arxiv.org/abs/1811.06965).
 
 * In middle-accuracy regime, EfficientNet-B1 is 7.6x smaller and 5.7x faster on CPU inference than [ResNet-152](https://arxiv.org/abs/1512.03385), with similar ImageNet accuracy.
 
-* Compared with the widely used [ResNet-50](https://arxiv.org/abs/1512.03385), EfficientNet-B4 improves the top-1 accuracy from 76.3% of ResNet-50 to 82.6% (+6.3%), under similar FLOPS constraint.
+* Compared to the widely used [ResNet-50](https://arxiv.org/abs/1512.03385), EfficientNet-B4 improves the top-1 accuracy from 76.3% of ResNet-50 to 82.6% (+6.3%), under similar FLOPS constraints.
 
 ## Examples
 
@@ -94,11 +95,11 @@ pip install -U git+https://github.com/qubvel/efficientnet
 pip install -U efficientnet
 ```
 
-## FAQ
+## Frequently Asked Questions
 
 * **How can I convert the original TensorFlow checkpoints to Keras HDF5?**
 
-Pick the target directory (like `dist`) and run the [converter script](./scripts) as follows:
+Pick the target directory (like `dist`) and run the [converter script](./scripts) from the repo directory as follows:
 
 ```bash
 ./scripts/convert_efficientnet.sh dist
