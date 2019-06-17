@@ -67,8 +67,8 @@ Available architectures and pretrained weights (converted from original repo):
 | EfficientNetB1 |0.7863 |0.9418 |    +    |
 | EfficientNetB2 |0.7968 |0.9475 |    +    |
 | EfficientNetB3 |0.8083 |0.9531 |    +    |
-| EfficientNetB4 |0.8259 |0.9612 |    -    |
-| EfficientNetB5 |0.8309 |0.9646 |    -    |
+| EfficientNetB4 |0.8259 |0.9612 |    +    |
+| EfficientNetB5 |0.8309 |0.9646 |    +    |
 | EfficientNetB6 |   -   |  -    |    -    |
 | EfficientNetB7 |   -   |  -    |    -    |
 
