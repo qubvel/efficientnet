@@ -1,10 +1,12 @@
 # EfficientNet-Keras
 
-This repository contains a Keras reimplementation of EfficientNet, a state-of-the-art convolutional neural network architecture [achieving higher accuracy and efficiency](https://arxiv.org/abs/1905.11946) than other ConvNets. The codebase is heavily inspired by the ([TensorFlow implementation](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet)).
+This repository contains a Keras reimplementation of **EfficientNet**, a state-of-the-art convolutional neural network architecture [achieving higher accuracy and efficiency](https://arxiv.org/abs/1905.11946) than other ConvNets.
+
+The codebase is heavily inspired by the [TensorFlow implementation](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet).
 
 ## Table of Contents
 
- 1. [About EfficientNets](#about)
+ 1. [About EfficientNet Models](#about-efficientnet-models)
  2. [Examples](#examples)
  3. [Models](#models)
  4. [Installation](#installation)
@@ -69,16 +71,16 @@ The performance of each model variant using the pre-trained weights converted fr
 | EfficientNetB6 |   -    |   -    |    -    |
 | EfficientNetB7 |   -    |   -    |    -    |
 
-"*" - topK accuracy score for converted models (imagenet `val` set)
+**\*** - topK accuracy score for converted models (imagenet `val` set)
 
-Weights for B6-B7 have not been made available yet (but might appear soon, follow the [issue](https://github.com/tensorflow/tpu/issues/377) for updates).
+**Note**: *Weights for B6-B7 have not been made available yet, but might appear soon. Follow the [issue](https://github.com/tensorflow/tpu/issues/377) for updates).*
 
 ## Installation
 
 ### Requirements
 
-* keras >= 2.2.0 (tensorflow)
-* scikit-image
+* `keras >= 2.2.0` + `tensorflow`
+* `scikit-image`
 
 ### Installing from the source
 
