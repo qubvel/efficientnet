@@ -67,14 +67,14 @@ Available architectures and pretrained weights (converted from original repo):
 | EfficientNetB1 |0.7863 |0.9418 |    +    |
 | EfficientNetB2 |0.7968 |0.9475 |    +    |
 | EfficientNetB3 |0.8083 |0.9531 |    +    |
-| EfficientNetB4 |   -   |  -    |    -    |
-| EfficientNetB5 |   -   |  -    |    -    |
+| EfficientNetB4 |0.8259 |0.9612 |    -    |
+| EfficientNetB5 |0.8309 |0.9646 |    -    |
 | EfficientNetB6 |   -   |  -    |    -    |
 | EfficientNetB7 |   -   |  -    |    -    |
 
 "*" - topK accuracy score for converted models (imagenet `val` set) 
  
-Weights for B4-B7 are not released yet ([issue](https://github.com/tensorflow/tpu/issues/377)).
+Weights for B6-B7 are not released yet ([issue](https://github.com/tensorflow/tpu/issues/377)).
 
 ### Installation <a name="installation"></a>
 
