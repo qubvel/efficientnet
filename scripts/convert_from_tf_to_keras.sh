@@ -225,7 +225,7 @@ for MODEL_VERSION in "${MODELS[@]}"; do
         --source $SOURCE_CODE_DIR \
         --tf_checkpoint $CHECKPOINTS_DIR/$MODEL_NAME \
         --output_file $CONVERTED_MODELS_DIR/$MODEL_NAME \
-        --weights_only $WEIGHTS_ONLY \
+        --weights_only $WEIGHTS_ONLY
 done
 
 notify "=" "Success!"
