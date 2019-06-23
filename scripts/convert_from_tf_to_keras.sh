@@ -25,11 +25,104 @@ if ! [ -x "$(command -v aria2c)" ]; then
     echo "Please install aria2c before continuing."
 fi
 
-if [ -z "$1" ]; then
-    echo "No target directory supplied, aborting."
-    exit 1
-fi
+notify() {
+    # $1: the string which encloses the message
+    # $2: the message text
+    MESSAGE="$1 $2 $1"
+    PADDING=$(eval $(echo printf '"$1%0.s"' {1..${#MESSAGE}}))
+    SPACING="$1 $(eval $(echo printf '.%0.s' {1..${#2}})) $1"
+    echo $PADDING
+    echo $SPACING
+    echo $MESSAGE
+    echo $SPACING
+    echo $PADDING
+}
 
+# The mechanics of reading the long options are taken from
+# https://mywiki.wooledge.org/ComplexOptionParsing#CA-78a4030cda5dc5c45377a4d98ebd4fe610e0aa7e_2
+usage() {
+    echo "Usage:"
+    echo "  $0 [ --help | -h ]"
+    echo "  $0 [ --target_dir=<value> | --target_dir <value> ] [options]"
+    echo
+    echo "Options:"
+    echo "  --make_venv=true|yes|1|t :: Make the virtual env and install dependencies"
+    echo "  --tmp_working_dir=true|yes|1|t :: Make a temprorary working directory the working space"
+    echo
+    echo "The default target_dir is dist."
+}
+
+# set defaults
+LAST_ARG_IDX=$(($# + 1))
+TARGET_DIR="dist"
+declare -A LONGOPTS
+# Use associative array to declare how many arguments a long option
+# expects. In this case we declare that loglevel expects/has one
+# argument and range has two. Long options that aren't listed in this
+# way will have zero arguments by default.
+LONGOPTS=([target_dir]=1)
+OPTSPEC="h-:"
+while getopts "$OPTSPEC" opt; do
+    while true; do
+        case "${opt}" in
+        -) #OPTARG is name-of-long-option or name-of-long-option=value
+            if [[ ${OPTARG} =~ .*=.* ]]; then # with this --key=value format only one argument is possible
+                opt=${OPTARG/=*/}
+                ((${#opt} <= 1)) && {
+                    echo "Syntax error: Invalid long option '$opt'" >&2
+                    exit 2
+                }
+                if (($((LONGOPTS[$opt])) != 1)); then
+                    echo "Syntax error: Option '$opt' does not support this syntax." >&2
+                    exit 2
+                fi
+                OPTARG=${OPTARG#*=}
+            else #with this --key value1 value2 format multiple arguments are possible
+                opt="$OPTARG"
+                ((${#opt} <= 1)) && {
+                    echo "Syntax error: Invalid long option '$opt'" >&2
+                    exit 2
+                }
+                OPTARG=(${@:OPTIND:$((LONGOPTS[$opt]))})
+                ((OPTIND += LONGOPTS[$opt]))
+                echo $OPTIND
+                ((OPTIND > $LAST_ARG_IDX)) && {
+                    echo "Syntax error: Not all required arguments for option '$opt' are given." >&2
+                    exit 3
+                }
+            fi
+            continue
+            ;;
+        target_dir)
+            TARGET_DIR=$(realpath $OPTARG)
+            ;;
+        saved_model)
+            SAVED_MODEL=$OPTARG
+            ;;
+        make_venv)
+            MAKE_VENV=$OPTARG
+            ;;
+        tmp_working_dir)
+            MAKE_TMP_WORKING_DIR=$OPTARG
+            ;;
+        h | help)
+            usage
+            exit 0
+            ;;
+        ?)
+            echo "Syntax error: Unknown short option '$OPTARG'" >&2
+            exit 2
+            ;;
+        *)
+            echo "Syntax error: Unknown long option '$opt'" >&2
+            exit 2
+            ;;
+        esac
+        break
+    done
+done
+
+# internal variables
 SOURCE_CODE_URL="https://raw.githubusercontent.com/tensorflow/tpu/master/models/official/efficientnet/"
 SOURCE_CODE_FILES=(
     "efficientnet_builder.py"
@@ -56,42 +149,45 @@ MODELS=(
     "b5"
 )
 
-WORKING_DIR="dist"
-# WORKING_DIR=$(mktemp -d)
-# trap 'rm -rf -- "$WORKING_DIR"' INT TERM HUP EXIT
-
-OUTPUT_DIR="dist"
+if [[ "$MAKE_TMP_WORKING_DIR" =~ ^(yes | true | t | 1)$ ]]; then
+    WORKING_DIR=$(mktemp -d)
+    trap 'rm -rf -- "$WORKING_DIR"' INT TERM HUP EXIT
+else
+    WORKING_DIR=$TARGET_DIR
+fi
 
 PARENT_DIR="$(pwd)"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-printf -- '=%.0s' {1..80}
-echo ""
-echo "Setting up the installation environment..."
-printf -- '=%.0s' {1..80}
-echo ""
+notify "=" "Setting up the installation environment..."
 
 set -e
 
-mkdir -p $OUTPUT_DIR
+mkdir -p $TARGET_DIR/$CONVERTED_MODELS_DIR
 
 mkdir -p $WORKING_DIR
 cd $WORKING_DIR
-# virtualenv --no-site-packages venv && \
-# source venv/bin/activate && \
-# pip install tensorflowjs numpy tensorflow keras scikit-image
+
+if [[ "$MAKE_VENV" =~ ^(yes | true | t | 1)$ ]]; then
+    virtualenv --no-site-packages venv
+    source venv/bin/activate
+    pip install tensorflowjs numpy tensorflow keras scikit-image
+fi
 
 if ! [ -d $CHECKPOINTS_DIR ]; then
-    printf -- '=%.0s' {1..80}
-    echo ""
-    echo "Downloading the checkpoints..."
-    printf -- '=%.0s' {1..80}
-    echo ""
+    notify "=" "Downloading the checkpoints..."
     mkdir -p $CHECKPOINTS_DIR
     for MODEL_VERSION in "${MODELS[@]}"; do
         if ! [ -d $CHECKPOINT_PREFIX$MODEL_VERSION ]; then
             cd $CHECKPOINTS_DIR
-            aria2c -x 16 -k 1M -o $MODEL_VERSION$CHECKPOINTS_EXT $CHECKPOINTS_URL$CHECKPOINT_PREFIX$MODEL_VERSION$CHECKPOINTS_EXT
+            # -x: maximum number of connections per server
+            # -k: minimum split size for multi-source download
+            # -o: target filename
+            aria2c \
+                -x 16 \
+                -k 1M \
+                -o $MODEL_VERSION$CHECKPOINTS_EXT \
+                $CHECKPOINTS_URL$CHECKPOINT_PREFIX$MODEL_VERSION$CHECKPOINTS_EXT
             tar xvf $MODEL_VERSION$CHECKPOINTS_EXT
             rm $MODEL_VERSION$CHECKPOINTS_EXT
             cd ..
@@ -99,18 +195,10 @@ if ! [ -d $CHECKPOINTS_DIR ]; then
     done
 fi
 
-printf -- '=%.0s' {1..80}
-echo ""
-echo "Converting the checkpoints to Keras..."
-printf -- '=%.0s' {1..80}
-echo ""
+notify "=" "Converting the checkpoints to Keras..."
 
 if ! [ -d $SOURCE_CODE_DIR ]; then
-    printf -- '-%.0s' {1..80}
-    echo ""
-    echo "Downloading the source code..."
-    printf -- '-%.0s' {1..80}
-    echo ""
+    notify "~" "Downloading the source code..."
     mkdir -p $SOURCE_CODE_DIR
     touch $SOURCE_CODE_DIR/__init__.py
     for SOURCE_CODE_FILE in "${SOURCE_CODE_FILES[@]}"; do
@@ -119,18 +207,12 @@ if ! [ -d $SOURCE_CODE_DIR ]; then
 fi
 
 cd $PARENT_DIR
-mkdir -p $OUTPUT_DIR/$CONVERTED_MODELS_DIR
-cd $OUTPUT_DIR
-
+cd $TARGET_DIR
 for MODEL_VERSION in "${MODELS[@]}"; do
 
     MODEL_NAME="efficientnet-"$MODEL_VERSION
 
-    printf -- '-%.0s' {1..80}
-    echo ""
-    echo "Converting $MODEL_NAME..."
-    printf -- '-%.0s' {1..80}
-    echo ""
+    notify "~" "Converting $MODEL_NAME..."
 
     WEIGHTS_ONLY="true"
 
@@ -142,12 +224,8 @@ for MODEL_VERSION in "${MODELS[@]}"; do
         --model_name $MODEL_NAME \
         --source $SOURCE_CODE_DIR \
         --tf_checkpoint $CHECKPOINTS_DIR/$MODEL_NAME \
-        --output_file $CONVERTED_MODELS_DIR/$MODEL_NAME".h5" \
-        --weights_only $WEIGHTS_ONLY
+        --output_file $CONVERTED_MODELS_DIR/$MODEL_NAME \
+        --weights_only $WEIGHTS_ONLY \
 done
 
-printf -- '=%.0s' {1..80}
-echo ""
-echo "Success!"
-printf -- '=%.0s' {1..80}
-echo ""
+notify "=" "Success!"
