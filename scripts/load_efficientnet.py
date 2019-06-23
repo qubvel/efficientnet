@@ -16,12 +16,13 @@
 
 import argparse
 import sys
-
-import numpy as np
+from pathlib import Path
 
 import tensorflow as tf
+from tensorflow.keras.experimental import export_saved_model
+from tensorflow.keras.layers import BatchNormalization, Conv2D, Dense
+
 from efficientnet.model import _get_model_by_name
-from keras.layers import BatchNormalization, Conv2D, Dense
 
 
 def group_weights(weights):
@@ -73,7 +74,12 @@ def load_weights(model, weights):
 
 
 def convert_tensorflow_model(
-    model_name, model_ckpt, output_file, example_img="misc/panda.jpg", weights_only=True
+    model_name,
+    model_ckpt,
+    output_file,
+    example_img="misc/panda.jpg",
+    weights_only=True,
+    saved_model=False,
 ):
     """ Loads and saves a TensorFlow model. """
     image_files = [example_img]
@@ -96,10 +102,15 @@ def convert_tensorflow_model(
         model_name, include_top=True, input_shape=None, weights=None, classes=1000
     )
     load_weights(model, weights)
-    if weights_only:
-        model.save_weights(output_file)
+    if saved_model:
+        Path(output_file).mkdir()
+        export_saved_model(model, output_file)
+        return
     else:
-        model.save(output_file)
+        if weights_only:
+            model.save_weights(f"{output_file}.h5")
+        else:
+            model.save(output_file)
 
 
 if __name__ == "__main__":
@@ -118,13 +129,13 @@ if __name__ == "__main__":
     parser.add_argument(
         "--tf_checkpoint",
         type=str,
-        default="pretrained_tensorflow/efficientnet-b0/",
+        default="./pretrained_tensorflow/efficientnet-b0/",
         help="checkpoint file path",
     )
     parser.add_argument(
         "--output_file",
         type=str,
-        default="pretrained_keras/efficientnet-b0.h5",
+        default="./pretrained_keras/efficientnet-b0",
         help="output Keras model file name",
     )
     parser.add_argument(
@@ -132,6 +143,12 @@ if __name__ == "__main__":
         type=str,
         default="true",
         help="Whether to include metadata in the serialized Keras model",
+    )
+    parser.add_argument(
+        "--saved_model",
+        type=str,
+        default="false",
+        help="Whether to export to SavedModel instead of Keras HDF5. Ignores --wegihts_only.",
     )
     args = parser.parse_args()
 
@@ -143,4 +160,5 @@ if __name__ == "__main__":
         model_ckpt=args.tf_checkpoint,
         output_file=args.output_file,
         weights_only=args.weights_only in ("yes", "true", "t", "1"),
+        saved_model=args.saved_model in ("yes", "true", "t", "1"),
     )
