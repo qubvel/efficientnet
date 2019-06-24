@@ -176,7 +176,7 @@ MODELS=(
     "b5"
 )
 
-if elementIn "$USE_VENV" "${TRUE[@]}"; then
+if elementIn "$MAKE_TMP_WORKING_DIR" "${TRUE[@]}"; then
     WORKING_DIR=$(mktemp -d)
     trap 'rm -rf -- "$WORKING_DIR"' INT TERM HUP EXIT
 else
