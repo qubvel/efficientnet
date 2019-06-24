@@ -142,6 +142,8 @@ CHECKPOINTS_EXT=".tar.gz"
 
 CONVERTED_MODELS_DIR="pretrained_keras"
 
+VIRTUALENV_DIR="venv"
+
 MODELS=(
     "b0"
     "b1"
@@ -171,9 +173,13 @@ mkdir -p $WORKING_DIR
 cd $WORKING_DIR
 
 if [[ "$MAKE_VENV" =~ ^(yes | true | t | 1)$ ]]; then
-    virtualenv --no-site-packages venv
-    source venv/bin/activate
-    pip install tensorflow keras scikit-image
+    if [ -d $VIRTUALENV_DIR ]; then
+        source $VIRTUALENV_DIR/bin/activate
+    else
+        virtualenv --no-site-packages $VIRTUALENV_DIR
+        source $VIRTUALENV_DIR/bin/activate
+        pip install tensorflowjs keras scikit-image
+    fi
 fi
 
 if ! [ -d $CHECKPOINTS_DIR ]; then
