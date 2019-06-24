@@ -173,7 +173,7 @@ cd $WORKING_DIR
 if [[ "$MAKE_VENV" =~ ^(yes | true | t | 1)$ ]]; then
     virtualenv --no-site-packages venv
     source venv/bin/activate
-    pip install tensorflowjs numpy tensorflow keras scikit-image
+    pip install tensorflow keras scikit-image
 fi
 
 if ! [ -d $CHECKPOINTS_DIR ]; then
