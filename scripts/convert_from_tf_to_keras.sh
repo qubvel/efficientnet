@@ -38,6 +38,21 @@ notify() {
     echo $PADDING
 }
 
+elementIn() {
+    # Checks whether $1 is in the array $2
+    # Example:
+    # The snippet
+    #   array=("1" "a string" "3")
+    #   containsElement "a string" "${array[@]}"
+    # Returns 1
+    # Source:
+    # https://stackoverflow.com/questions/3685970/check-if-a-bash-array-contains-a-value
+    local e match="$1"
+    shift
+    for e; do [[ "$e" == "$match" ]] && return 0; done
+    return 1
+}
+
 # The mechanics of reading the long options are taken from
 # https://mywiki.wooledge.org/ComplexOptionParsing#CA-78a4030cda5dc5c45377a4d98ebd4fe610e0aa7e_2
 usage() {
@@ -46,7 +61,7 @@ usage() {
     echo "  $0 [ --target_dir=<value> | --target_dir <value> ] [options]"
     echo
     echo "Options:"
-    echo "  --use_venv=true|yes|1|t :: Use the virtual env with pre-installed dependencies"
+    echo "  --use_venv=true|yes|1|t|y :: Use the virtual env with pre-installed dependencies"
     echo "  --tmp_working_dir=true|yes|1|t :: Make a temporary working directory the working space"
     echo "  --saved_model=true|yes|1|t :: Export to TensorFlow SavedModel"
     echo
@@ -57,12 +72,13 @@ usage() {
 LAST_ARG_IDX=$(($# + 1))
 TARGET_DIR="dist"
 SAVED_MODEL="false"
+USE_VENV="false"
 declare -A LONGOPTS
 # Use associative array to declare how many arguments a long option
 # expects. In this case we declare that loglevel expects/has one
 # argument and range has two. Long options that aren't listed in this
 # way will have zero arguments by default.
-LONGOPTS=([target_dir]=1 [saved_model]=1)
+LONGOPTS=([target_dir]=1 [saved_model]=1 [use_venv]=1)
 OPTSPEC="h-:"
 while getopts "$OPTSPEC" opt; do
     while true; do
@@ -125,6 +141,13 @@ while getopts "$OPTSPEC" opt; do
 done
 
 # internal variables
+TRUE=(
+    "true"
+    "t"
+    "1"
+    "yes"
+    "y"
+)
 SOURCE_CODE_URL="https://raw.githubusercontent.com/tensorflow/tpu/master/models/official/efficientnet/"
 SOURCE_CODE_FILES=(
     "efficientnet_builder.py"
@@ -153,7 +176,7 @@ MODELS=(
     "b5"
 )
 
-if [[ "$MAKE_TMP_WORKING_DIR" =~ ^(yes | true | t | 1)$ ]]; then
+if elementIn "$USE_VENV" "${TRUE[@]}"; then
     WORKING_DIR=$(mktemp -d)
     trap 'rm -rf -- "$WORKING_DIR"' INT TERM HUP EXIT
 else
@@ -172,7 +195,7 @@ mkdir -p $TARGET_DIR/$CONVERTED_MODELS_DIR
 mkdir -p $WORKING_DIR
 cd $WORKING_DIR
 
-if [[ "$USE_VENV" =~ ^(yes | true | t | 1)$ ]]; then
+if elementIn "$USE_VENV" "${TRUE[@]}"; then
     if [ -d $VIRTUALENV_DIR ]; then
         source $VIRTUALENV_DIR/bin/activate
     else
