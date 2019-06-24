@@ -46,7 +46,7 @@ usage() {
     echo "  $0 [ --target_dir=<value> | --target_dir <value> ] [options]"
     echo
     echo "Options:"
-    echo "  --make_venv=true|yes|1|t :: Make the virtual env and install dependencies"
+    echo "  --use_venv=true|yes|1|t :: Use the virtual env with pre-installed dependencies"
     echo "  --tmp_working_dir=true|yes|1|t :: Make a temporary working directory the working space"
     echo "  --saved_model=true|yes|1|t :: Export to TensorFlow SavedModel"
     echo
@@ -101,8 +101,8 @@ while getopts "$OPTSPEC" opt; do
         saved_model)
             SAVED_MODEL=$OPTARG
             ;;
-        make_venv)
-            MAKE_VENV=$OPTARG
+        use_venv)
+            USE_VENV=$OPTARG
             ;;
         tmp_working_dir)
             MAKE_TMP_WORKING_DIR=$OPTARG
@@ -172,7 +172,7 @@ mkdir -p $TARGET_DIR/$CONVERTED_MODELS_DIR
 mkdir -p $WORKING_DIR
 cd $WORKING_DIR
 
-if [[ "$MAKE_VENV" =~ ^(yes | true | t | 1)$ ]]; then
+if [[ "$USE_VENV" =~ ^(yes | true | t | 1)$ ]]; then
     if [ -d $VIRTUALENV_DIR ]; then
         source $VIRTUALENV_DIR/bin/activate
     else
