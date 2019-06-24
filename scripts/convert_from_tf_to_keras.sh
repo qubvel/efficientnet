@@ -251,7 +251,7 @@ for MODEL_VERSION in "${MODELS[@]}"; do
         WEIGHTS_ONLY="false"
     fi
 
-    PYTHONPATH=.. python $SCRIPT_DIR/load_efficientnet.py \
+    PYTHONPATH=../$SCRIPT_DIR python $SCRIPT_DIR/load_efficientnet.py \
         --model_name $MODEL_NAME \
         --source $SOURCE_CODE_DIR \
         --tf_checkpoint $CHECKPOINTS_DIR/$MODEL_NAME \
