@@ -55,12 +55,13 @@ usage() {
 # set defaults
 LAST_ARG_IDX=$(($# + 1))
 TARGET_DIR="dist"
+USE_VENV="false"
 declare -A LONGOPTS
 # Use associative array to declare how many arguments a long option
 # expects. In this case we declare that loglevel expects/has one
 # argument and range has two. Long options that aren't listed in this
 # way will have zero arguments by default.
-LONGOPTS=([target_dir]=1)
+LONGOPTS=([target_dir]=1 [use_venv]=1)
 OPTSPEC="h-:"
 while getopts "$OPTSPEC" opt; do
     while true; do
@@ -95,9 +96,6 @@ while getopts "$OPTSPEC" opt; do
             ;;
         target_dir)
             TARGET_DIR=$(realpath $OPTARG)
-            ;;
-        saved_model)
-            SAVED_MODEL=$OPTARG
             ;;
         use_venv)
             USE_VENV=$OPTARG
