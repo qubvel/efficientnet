@@ -47,7 +47,7 @@ usage() {
     echo
     echo "Options:"
     echo "  --make_venv=true|yes|1|t :: Make the virtual env and install dependencies"
-    echo "  --tmp_working_dir=true|yes|1|t :: Make a temprorary working directory the working space"
+    echo "  --tmp_working_dir=true|yes|1|t :: Make a temporary working directory the working space"
     echo "  --saved_model=true|yes|1|t :: Export to TensorFlow SavedModel"
     echo
     echo "The default target_dir is dist."
