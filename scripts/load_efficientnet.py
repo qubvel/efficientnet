@@ -155,10 +155,11 @@ if __name__ == "__main__":
     sys.path.append(args.source)
     import eval_ckpt_main
 
+    true_values = ("yes", "true", "t", "1", "y")
     convert_tensorflow_model(
         model_name=args.model_name,
         model_ckpt=args.tf_checkpoint,
         output_file=args.output_file,
-        weights_only=args.weights_only in ("yes", "true", "t", "1"),
-        saved_model=args.saved_model in ("yes", "true", "t", "1"),
+        weights_only=args.weights_only in true_values,
+        saved_model=args.saved_model in true_values,
     )
