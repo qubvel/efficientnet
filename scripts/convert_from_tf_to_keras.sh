@@ -251,13 +251,13 @@ for MODEL_VERSION in "${MODELS[@]}"; do
         WEIGHTS_ONLY="false"
     fi
 
-    PYTHONPATH=../$SCRIPT_DIR python $SCRIPT_DIR/load_efficientnet.py \
+    $(PYTHONPATH=$(dirname $SCRIPT_DIR) python $SCRIPT_DIR/load_efficientnet.py \
         --model_name $MODEL_NAME \
         --source $SOURCE_CODE_DIR \
         --tf_checkpoint $CHECKPOINTS_DIR/$MODEL_NAME \
         --output_file $CONVERTED_MODELS_DIR/$MODEL_NAME \
         --weights_only $WEIGHTS_ONLY \
-        --saved_model $SAVED_MODEL
+        --saved_model $SAVED_MODEL)
 done
 
 notify "=" "Success!"
