@@ -19,29 +19,31 @@
   ICML'19, https://arxiv.org/abs/1905.11946
 """
 
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+from __future__ import absolute_import, division, print_function
 
-import collections
 import math
-import numpy as np
-import six
+
+import tensorflow.keras.backend as K
+import tensorflow.keras.layers as KL
+import tensorflow.keras.models as KM
+from tensorflow.keras.utils import get_file
 from six.moves import xrange  # pylint: disable=redefined-builtin
-import tensorflow as tf
 
-import keras.backend as K
-import keras.models as KM
-import keras.layers as KL
-from keras.utils import get_file
-
-from .layers import Swish, DropConnect
-from .params import get_model_params, IMAGENET_WEIGHTS
 from .initializers import conv_kernel_initializer, dense_kernel_initializer
+from .layers import DropConnect, Swish
+from .params import IMAGENET_WEIGHTS, get_model_params
 
-
-__all__ = ['EfficientNet', 'EfficientNetB0', 'EfficientNetB1', 'EfficientNetB2', 'EfficientNetB3',
-           'EfficientNetB4', 'EfficientNetB5', 'EfficientNetB6', 'EfficientNetB7']
+__all__ = [
+    "EfficientNet",
+    "EfficientNetB0",
+    "EfficientNetB1",
+    "EfficientNetB2",
+    "EfficientNetB3",
+    "EfficientNetB4",
+    "EfficientNetB5",
+    "EfficientNetB6",
+    "EfficientNetB7",
+]
 
 
 def round_filters(filters, global_params):
@@ -72,10 +74,9 @@ def round_repeats(repeats, global_params):
 
 
 def SEBlock(block_args, global_params):
-    num_reduced_filters = max(
-        1, int(block_args.input_filters * block_args.se_ratio))
+    num_reduced_filters = max(1, int(block_args.input_filters * block_args.se_ratio))
     filters = block_args.input_filters * block_args.expand_ratio
-    if global_params.data_format == 'channels_first':
+    if global_params.data_format == "channels_first":
         channel_axis = 1
         spatial_dims = [2, 3]
     else:
@@ -90,8 +91,8 @@ def SEBlock(block_args, global_params):
             kernel_size=[1, 1],
             strides=[1, 1],
             kernel_initializer=conv_kernel_initializer,
-            padding='same',
-            use_bias=True
+            padding="same",
+            use_bias=True,
         )(x)
         x = Swish()(x)
         # Excite
@@ -100,10 +101,10 @@ def SEBlock(block_args, global_params):
             kernel_size=[1, 1],
             strides=[1, 1],
             kernel_initializer=conv_kernel_initializer,
-            padding='same',
-            use_bias=True
+            padding="same",
+            use_bias=True,
         )(x)
-        x = KL.Activation('sigmoid')(x)
+        x = KL.Activation("sigmoid")(x)
         out = KL.Multiply()([x, inputs])
         return out
 
@@ -114,15 +115,18 @@ def MBConvBlock(block_args, global_params, drop_connect_rate=None):
     batch_norm_momentum = global_params.batch_norm_momentum
     batch_norm_epsilon = global_params.batch_norm_epsilon
 
-    if global_params.data_format == 'channels_first':
+    if global_params.data_format == "channels_first":
         channel_axis = 1
         spatial_dims = [2, 3]
     else:
         channel_axis = -1
         spatial_dims = [1, 2]
 
-    has_se = (block_args.se_ratio is not None) and (
-            block_args.se_ratio > 0) and (block_args.se_ratio <= 1)
+    has_se = (
+        (block_args.se_ratio is not None)
+        and (block_args.se_ratio > 0)
+        and (block_args.se_ratio <= 1)
+    )
 
     filters = block_args.input_filters * block_args.expand_ratio
     kernel_size = block_args.kernel_size
@@ -135,13 +139,13 @@ def MBConvBlock(block_args, global_params, drop_connect_rate=None):
                 kernel_size=[1, 1],
                 strides=[1, 1],
                 kernel_initializer=conv_kernel_initializer,
-                padding='same',
-                use_bias=False
+                padding="same",
+                use_bias=False,
             )(inputs)
             x = KL.BatchNormalization(
                 axis=channel_axis,
                 momentum=batch_norm_momentum,
-                epsilon=batch_norm_epsilon
+                epsilon=batch_norm_epsilon,
             )(x)
             x = Swish()(x)
         else:
@@ -151,13 +155,11 @@ def MBConvBlock(block_args, global_params, drop_connect_rate=None):
             [kernel_size, kernel_size],
             strides=block_args.strides,
             depthwise_initializer=conv_kernel_initializer,
-            padding='same',
-            use_bias=False
+            padding="same",
+            use_bias=False,
         )(x)
         x = KL.BatchNormalization(
-            axis=channel_axis,
-            momentum=batch_norm_momentum,
-            epsilon=batch_norm_epsilon
+            axis=channel_axis, momentum=batch_norm_momentum, epsilon=batch_norm_epsilon
         )(x)
         x = Swish()(x)
 
@@ -171,19 +173,18 @@ def MBConvBlock(block_args, global_params, drop_connect_rate=None):
             kernel_size=[1, 1],
             strides=[1, 1],
             kernel_initializer=conv_kernel_initializer,
-            padding='same',
-            use_bias=False
+            padding="same",
+            use_bias=False,
         )(x)
         x = KL.BatchNormalization(
-            axis=channel_axis,
-            momentum=batch_norm_momentum,
-            epsilon=batch_norm_epsilon
+            axis=channel_axis, momentum=batch_norm_momentum, epsilon=batch_norm_epsilon
         )(x)
 
         if block_args.id_skip:
-            if all(
-                    s == 1 for s in block_args.strides
-            ) and block_args.input_filters == block_args.output_filters:
+            if (
+                all(s == 1 for s in block_args.strides)
+                and block_args.input_filters == block_args.output_filters
+            ):
                 # only apply drop_connect if skip presents.
                 if drop_connect_rate:
                     x = DropConnect(drop_connect_rate)(x)
@@ -193,10 +194,12 @@ def MBConvBlock(block_args, global_params, drop_connect_rate=None):
     return block
 
 
-def EfficientNet(input_shape, block_args_list, global_params, include_top=True, pooling=None):
+def EfficientNet(
+    input_shape, block_args_list, global_params, include_top=True, pooling=None
+):
     batch_norm_momentum = global_params.batch_norm_momentum
     batch_norm_epsilon = global_params.batch_norm_epsilon
-    if global_params.data_format == 'channels_first':
+    if global_params.data_format == "channels_first":
         channel_axis = 1
     else:
         channel_axis = -1
@@ -209,13 +212,11 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True, 
         kernel_size=[3, 3],
         strides=[2, 2],
         kernel_initializer=conv_kernel_initializer,
-        padding='same',
-        use_bias=False
+        padding="same",
+        use_bias=False,
     )(x)
     x = KL.BatchNormalization(
-        axis=channel_axis,
-        momentum=batch_norm_momentum,
-        epsilon=batch_norm_epsilon
+        axis=channel_axis, momentum=batch_norm_momentum, epsilon=batch_norm_epsilon
     )(x)
     x = Swish()(x)
 
@@ -231,20 +232,24 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True, 
         block_args = block_args._replace(
             input_filters=round_filters(block_args.input_filters, global_params),
             output_filters=round_filters(block_args.output_filters, global_params),
-            num_repeat=round_repeats(block_args.num_repeat, global_params)
+            num_repeat=round_repeats(block_args.num_repeat, global_params),
         )
 
         # The first block needs to take care of stride and filter size increase.
-        x = MBConvBlock(block_args, global_params,
-                        drop_connect_rate=drop_rate_dx * block_idx)(x)
+        x = MBConvBlock(
+            block_args, global_params, drop_connect_rate=drop_rate_dx * block_idx
+        )(x)
         block_idx += 1
 
         if block_args.num_repeat > 1:
-            block_args = block_args._replace(input_filters=block_args.output_filters, strides=[1, 1])
+            block_args = block_args._replace(
+                input_filters=block_args.output_filters, strides=[1, 1]
+            )
 
         for _ in xrange(block_args.num_repeat - 1):
-            x = MBConvBlock(block_args, global_params,
-                            drop_connect_rate=drop_rate_dx * block_idx)(x)
+            x = MBConvBlock(
+                block_args, global_params, drop_connect_rate=drop_rate_dx * block_idx
+            )(x)
             block_idx += 1
 
     # Head part
@@ -253,13 +258,11 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True, 
         kernel_size=[1, 1],
         strides=[1, 1],
         kernel_initializer=conv_kernel_initializer,
-        padding='same',
-        use_bias=False
+        padding="same",
+        use_bias=False,
     )(x)
     x = KL.BatchNormalization(
-        axis=channel_axis,
-        momentum=batch_norm_momentum,
-        epsilon=batch_norm_epsilon
+        axis=channel_axis, momentum=batch_norm_momentum, epsilon=batch_norm_epsilon
     )(x)
     x = Swish()(x)
 
@@ -267,12 +270,14 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True, 
         x = KL.GlobalAveragePooling2D(data_format=global_params.data_format)(x)
         if global_params.dropout_rate > 0:
             x = KL.Dropout(global_params.dropout_rate)(x)
-        x = KL.Dense(global_params.num_classes, kernel_initializer=dense_kernel_initializer)(x)
-        x = KL.Activation('softmax')(x)
+        x = KL.Dense(
+            global_params.num_classes, kernel_initializer=dense_kernel_initializer
+        )(x)
+        x = KL.Activation("softmax")(x)
     else:
-        if pooling == 'avg':
+        if pooling == "avg":
             x = KL.GlobalAveragePooling2D(data_format=global_params.data_format)(x)
-        elif pooling == 'max':
+        elif pooling == "max":
             x = KL.GlobalMaxPooling2D(data_format=global_params.data_format)(x)
 
     outputs = x
@@ -281,7 +286,14 @@ def EfficientNet(input_shape, block_args_list, global_params, include_top=True, 
     return model
 
 
-def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=None, classes=1000, pooling=None):
+def _get_model_by_name(
+    model_name,
+    input_shape=None,
+    include_top=True,
+    weights=None,
+    classes=1000,
+    pooling=None,
+):
     """Re-Implementation of EfficientNet for Keras
 
     Reference:
@@ -313,81 +325,153 @@ def _get_model_by_name(model_name, input_shape=None, include_top=True, weights=N
         A Keras model instance.
 
     """
-    if weights not in {None, 'imagenet'}:
+    if weights not in {None, "imagenet"}:
         raise ValueError('Parameter `weights` should be one of [None, "imagenet"]')
 
-    if weights == 'imagenet' and model_name not in IMAGENET_WEIGHTS:
-        raise ValueError('There are not pretrained weights for {} model.'.format(model_name))
+    if weights == "imagenet" and model_name not in IMAGENET_WEIGHTS:
+        raise ValueError(
+            "There are not pretrained weights for {} model.".format(model_name)
+        )
 
-    if weights == 'imagenet' and include_top and classes != 1000:
-        raise ValueError('If using `weights` and `include_top`'
-                         ' `classes` should be 1000')
+    if weights == "imagenet" and include_top and classes != 1000:
+        raise ValueError(
+            "If using `weights` and `include_top`" " `classes` should be 1000"
+        )
 
     block_agrs_list, global_params, default_input_shape = get_model_params(
-        model_name, override_params={'num_classes': classes}
+        model_name, override_params={"num_classes": classes}
     )
 
     if input_shape is None:
         input_shape = (default_input_shape, default_input_shape, 3)
 
-    model = EfficientNet(input_shape, block_agrs_list, global_params, include_top=include_top, pooling=pooling)
-    model.name = model_name
+    model = EfficientNet(
+        input_shape,
+        block_agrs_list,
+        global_params,
+        include_top=include_top,
+        pooling=pooling,
+    )
 
     if weights:
         if not include_top:
-            weights_name = model_name + '-notop'
+            weights_name = model_name + "-notop"
         else:
             weights_name = model_name
         weights = IMAGENET_WEIGHTS[weights_name]
         weights_path = get_file(
-            weights['name'],
-            weights['url'],
-            cache_subdir='models',
-            md5_hash=weights['md5'],
+            weights["name"],
+            weights["url"],
+            cache_subdir="models",
+            md5_hash=weights["md5"],
         )
         model.load_weights(weights_path)
 
     return model
 
 
-def EfficientNetB0(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
-    return _get_model_by_name('efficientnet-b0', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes, pooling=pooling)
+def EfficientNetB0(
+    include_top=True, input_shape=None, weights=None, classes=1000, pooling=None
+):
+    return _get_model_by_name(
+        "efficientnet-b0",
+        include_top=include_top,
+        input_shape=input_shape,
+        weights=weights,
+        classes=classes,
+        pooling=pooling,
+    )
 
 
-def EfficientNetB1(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
-    return _get_model_by_name('efficientnet-b1', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes, pooling=pooling)
+def EfficientNetB1(
+    include_top=True, input_shape=None, weights=None, classes=1000, pooling=None
+):
+    return _get_model_by_name(
+        "efficientnet-b1",
+        include_top=include_top,
+        input_shape=input_shape,
+        weights=weights,
+        classes=classes,
+        pooling=pooling,
+    )
 
 
-def EfficientNetB2(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
-    return _get_model_by_name('efficientnet-b2', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes, pooling=pooling)
+def EfficientNetB2(
+    include_top=True, input_shape=None, weights=None, classes=1000, pooling=None
+):
+    return _get_model_by_name(
+        "efficientnet-b2",
+        include_top=include_top,
+        input_shape=input_shape,
+        weights=weights,
+        classes=classes,
+        pooling=pooling,
+    )
 
 
-def EfficientNetB3(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
-    return _get_model_by_name('efficientnet-b3', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes, pooling=pooling)
+def EfficientNetB3(
+    include_top=True, input_shape=None, weights=None, classes=1000, pooling=None
+):
+    return _get_model_by_name(
+        "efficientnet-b3",
+        include_top=include_top,
+        input_shape=input_shape,
+        weights=weights,
+        classes=classes,
+        pooling=pooling,
+    )
 
 
-def EfficientNetB4(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
-    return _get_model_by_name('efficientnet-b4', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes, pooling=pooling)
+def EfficientNetB4(
+    include_top=True, input_shape=None, weights=None, classes=1000, pooling=None
+):
+    return _get_model_by_name(
+        "efficientnet-b4",
+        include_top=include_top,
+        input_shape=input_shape,
+        weights=weights,
+        classes=classes,
+        pooling=pooling,
+    )
 
 
-def EfficientNetB5(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
-    return _get_model_by_name('efficientnet-b5', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes, pooling=pooling)
+def EfficientNetB5(
+    include_top=True, input_shape=None, weights=None, classes=1000, pooling=None
+):
+    return _get_model_by_name(
+        "efficientnet-b5",
+        include_top=include_top,
+        input_shape=input_shape,
+        weights=weights,
+        classes=classes,
+        pooling=pooling,
+    )
 
 
-def EfficientNetB6(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
-    return _get_model_by_name('efficientnet-b6', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes, pooling=pooling)
+def EfficientNetB6(
+    include_top=True, input_shape=None, weights=None, classes=1000, pooling=None
+):
+    return _get_model_by_name(
+        "efficientnet-b6",
+        include_top=include_top,
+        input_shape=input_shape,
+        weights=weights,
+        classes=classes,
+        pooling=pooling,
+    )
 
 
-def EfficientNetB7(include_top=True, input_shape=None, weights=None, classes=1000, pooling=None):
-    return _get_model_by_name('efficientnet-b7', include_top=include_top, input_shape=input_shape,
-                              weights=weights, classes=classes, pooling=pooling)
+def EfficientNetB7(
+    include_top=True, input_shape=None, weights=None, classes=1000, pooling=None
+):
+    return _get_model_by_name(
+        "efficientnet-b7",
+        include_top=include_top,
+        input_shape=input_shape,
+        weights=weights,
+        classes=classes,
+        pooling=pooling,
+    )
 
 
 EfficientNetB0.__doc__ = _get_model_by_name.__doc__

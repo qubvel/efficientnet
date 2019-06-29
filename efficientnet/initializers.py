@@ -1,9 +1,8 @@
 import numpy as np
 import tensorflow as tf
-import keras.backend as K
-
-from keras.initializers import Initializer
-from keras.utils.generic_utils import get_custom_objects
+import tensorflow.keras.backend as K
+from tensorflow.keras.initializers import Initializer
+from tensorflow.python.keras.utils.generic_utils import get_custom_objects
 
 
 class EfficientConv2DKernelInitializer(Initializer):
@@ -28,7 +27,8 @@ class EfficientConv2DKernelInitializer(Initializer):
         kernel_height, kernel_width, _, out_filters = shape
         fan_out = int(kernel_height * kernel_width * out_filters)
         return tf.random_normal(
-            shape, mean=0.0, stddev=np.sqrt(2.0 / fan_out), dtype=dtype)
+            shape, mean=0.0, stddev=np.sqrt(2.0 / fan_out), dtype=dtype
+        )
 
 
 class EfficientDenseKernelInitializer(Initializer):
@@ -70,7 +70,9 @@ conv_kernel_initializer = EfficientConv2DKernelInitializer()
 dense_kernel_initializer = EfficientDenseKernelInitializer()
 
 
-get_custom_objects().update({
-    'EfficientDenseKernelInitializer': EfficientDenseKernelInitializer,
-    'EfficientConv2DKernelInitializer': EfficientConv2DKernelInitializer,
-})
+get_custom_objects().update(
+    {
+        "EfficientDenseKernelInitializer": EfficientDenseKernelInitializer,
+        "EfficientConv2DKernelInitializer": EfficientConv2DKernelInitializer,
+    }
+)
