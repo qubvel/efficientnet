@@ -96,6 +96,7 @@ def convert_tensorflow_model(
         model_name, include_top=True, input_shape=None, weights=None, classes=1000
     )
     load_weights(model, weights)
+    output_file = f"{output_file}.h5"
     if weights_only:
         model.save_weights(output_file)
     else:
@@ -124,7 +125,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--output_file",
         type=str,
-        default="pretrained_keras/efficientnet-b0.h5",
+        default="pretrained_keras/efficientnet-b0",
         help="output Keras model file name",
     )
     parser.add_argument(
@@ -138,9 +139,10 @@ if __name__ == "__main__":
     sys.path.append(args.source)
     import eval_ckpt_main
 
+    true_values = ("yes", "true", "t", "1", "y")
     convert_tensorflow_model(
         model_name=args.model_name,
         model_ckpt=args.tf_checkpoint,
         output_file=args.output_file,
-        weights_only=args.weights_only in ("yes", "true", "t", "1"),
+        weights_only=args.weights_only in true_values,
     )

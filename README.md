@@ -102,8 +102,10 @@ pip install -U efficientnet
 Pick the target directory (like `dist`) and run the [converter script](./scripts) from the repo directory as follows:
 
 ```bash
-./scripts/convert_efficientnet.sh dist
+./scripts/convert_efficientnet.sh --target_dir dist
 ```
+
+You can also optionally create the virtual environment with all the dependencies installed by adding `--make_venv=true` and operate in a self-destructing temporary location instead of the target directory by setting `--tmp_working_dir=true`.
 
 * **Why are B6 and B7 model variants not yet supported?**
 
