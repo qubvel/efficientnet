@@ -13,7 +13,6 @@ The codebase is heavily inspired by the [TensorFlow implementation](https://gith
  4. [Installation](#installation)
  5. [Frequently Asked Questions](#frequently-asked-questions)
 
-
 ## About EfficientNet Models
 
 EfficientNets rely on AutoML and compound scaling to achieve superior performance without compromising resource efficiency. The [AutoML Mobile framework](https://ai.googleblog.com/2018/08/mnasnet-towards-automating-design-of.html) has helped develop a mobile-size baseline network, **EfficientNet-B0**, which is then improved by the compound scaling method  to obtain EfficientNet-B1 to B7.
@@ -74,7 +73,6 @@ The performance of each model variant using the pre-trained weights converted fr
 | EfficientNetB7 |   -    |   -    |    -    |
 
 **\*** - topK accuracy score for converted models (imagenet `val` set)
-
 
 ## Installation
 
