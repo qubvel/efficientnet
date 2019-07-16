@@ -1,0 +1,8 @@
+deploy:
+  provider: pypi
+  user: qubvel
+  password:
+    secure: Xqqsq2t5TYVFRbGmUUB7JuK6EBPsH+XB/L4aIE2697hMj0T42VOnZ0IB+ldhZi9taCNItfxs37uQ69x9h+G8/PSIK5YBkWDjMRfE3LeVaQQlM2YD1u5G9VhIe0/QRhsRzmQgzaIagDFORtOuozpeZ20+YKSaebso7XvmLN/i7rHlnBtzaK0SILmhcNtrKGV5cj96B10wg+QAGBKrcelJXXGbr1a1uuFEKdbXNXLNwU2tkOziydCnighvk02TwU1+sO6YcjZfLBZXNQ3sgZWDd/bKbAIGOO4baQYBT7JP6YbawmdTPovJMxWMAn6NqaYO+EzwUCdL/DeuSqxfrPZnWIgsJPZ0qH1didCAJQUE7kHaglgoSRd+nebRlUTnBsSA52/n2dvootquQzsYF+pJswHJ5lrvpMemdBIZ7GOs0VAGjzBxRqAbEL9lHhIyEU5li+ECP2qG8J9paIH1Z01V7puyYwY0/4iSqhpvoHrSoRVexzTRnGXDZArMWh48Fh5mmadKsFvlGPiju1CwH851yN/aDVQ6SrsSxnfWE7WEqAO3dKSJBdUFcjDGgbPiWZDuCVAO/o9/ZyJ4Y2SECQFAkvL+cgOBZj06LcqetGPvBThSVa9xeWSAAKiWMBtA1Hs4tegDrO9vHzq4P4wHaudRjhjIbwZps4TWooptOqKCOzg=
+  on:
+    tags: true
+  skip_existing: true
