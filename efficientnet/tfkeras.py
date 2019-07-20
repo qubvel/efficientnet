@@ -3,6 +3,7 @@ from . import model
 
 from .preprocessing import center_crop_and_resize
 
+EfficientNetBn = inject_tfkeras_modules(model.EfficientNetBn)
 EfficientNetB0 = inject_tfkeras_modules(model.EfficientNetB0)
 EfficientNetB1 = inject_tfkeras_modules(model.EfficientNetB1)
 EfficientNetB2 = inject_tfkeras_modules(model.EfficientNetB2)
