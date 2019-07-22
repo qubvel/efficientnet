@@ -35,7 +35,7 @@ install:
   - conda install mkl mkl-service
 
   # install keras
-    if [ -z $KERAS_VERSION ]; then
+  - if [ -z $KERAS_VERSION ]; then
       echo "Using tf.keras";
     else
       echo "Using keras";
