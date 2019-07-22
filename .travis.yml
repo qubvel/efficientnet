@@ -6,6 +6,8 @@ matrix:
         # different frameworks
         - python: 3.6
           env: KERAS_VERSION=2.2.4
+        - python: 3.6
+          env: TF_KERAS=true
 
 git:
   submodules: true
@@ -25,10 +27,10 @@ install:
 
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION pytest pandas
   - source activate test-environment
-  - pip install --only-binary=numpy,scipy numpy nose scipy matplotlib h5py theano scikit-image
+  - pip install --only-binary=numpy,scipy numpy nose scipy matplotlib h5py theano scikit-image keras_applications
 
   # install TensorFlow (CPU version).
-  - pip install tensorflow==1.12
+  - pip install tensorflow==1.14
 
   # set library path
   - export LD_LIBRARY_PATH=$HOME/miniconda/envs/test-environment/lib/:$LD_LIBRARY_PATH
