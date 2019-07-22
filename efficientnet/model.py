@@ -23,26 +23,27 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-import collections
+import json
 import math
 import string
-import json
+import collections
 import numpy as np
+
 from six.moves import xrange
+from keras_applications.imagenet_utils import _obtain_input_shape
+from keras_applications.imagenet_utils import decode_predictions
 
 from . import get_submodules_from_kwargs
-from .imagenet_utils import _obtain_input_shape, decode_predictions
-
 
 backend = None
 layers = None
 models = None
 keras_utils = None
 
-
 BASE_WEIGHTS_PATH = (
     'https://github.com/Callidior/keras-applications/'
     'releases/download/efficientnet/')
+
 WEIGHTS_HASHES = {
     'efficientnet-b0': ('dd631faed10515e2cd08e3b5da0624b3'
                         'f50d523fe69b9b5fdf037365f9f907f0',
@@ -73,7 +74,6 @@ WEIGHTS_HASHES = {
 MEAN_RGB = [0.485 * 255, 0.456 * 255, 0.406 * 255]
 STDDEV_RGB = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
-
 BlockArgs = collections.namedtuple('BlockArgs', [
     'kernel_size', 'num_repeat', 'input_filters', 'output_filters',
     'expand_ratio', 'id_skip', 'strides', 'se_ratio'
@@ -81,7 +81,6 @@ BlockArgs = collections.namedtuple('BlockArgs', [
 # defaults will be a public argument for namedtuple in Python 3.7
 # https://docs.python.org/3/library/collections.html#collections.namedtuple
 BlockArgs.__new__.__defaults__ = (None,) * len(BlockArgs._fields)
-
 
 DEFAULT_BLOCKS_ARGS = [
     BlockArgs(kernel_size=3, num_repeat=1, input_filters=32, output_filters=16,

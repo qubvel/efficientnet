@@ -13,6 +13,8 @@
 # limitations under the License.
 # ==============================================================================
 
+import functools
+
 _KERAS_BACKEND = None
 _KERAS_LAYERS = None
 _KERAS_MODELS = None
@@ -30,7 +32,56 @@ def get_submodules_from_kwargs(kwargs):
     return backend, layers, models, utils
 
 
-from keras.models import load_model
+def inject_keras_modules(func):
+    import keras
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        kwargs['backend'] = keras.backend
+        kwargs['layers'] = keras.layers
+        kwargs['models'] = keras.models
+        kwargs['utils'] = keras.utils
+        return func(*args, **kwargs)
 
-from .model import *
-from .preprocessing import center_crop_and_resize, preprocess_input
+    return wrapper
+
+
+def inject_tfkeras_modules(func):
+    import tensorflow.keras as tfkeras
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        kwargs['backend'] = tfkeras.backend
+        kwargs['layers'] = tfkeras.layers
+        kwargs['models'] = tfkeras.models
+        kwargs['utils'] = tfkeras.utils
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
+def init_keras_custom_objects():
+    from .model import swish
+
+    custom_objects = {
+        'swish': swish,
+    }
+
+    try:
+
+        import keras
+        keras.utils.generic_utils.get_custom_objects().update(custom_objects)
+    except ImportError:
+        pass
+
+
+def init_tfkeras_custom_objects():
+    from .model import swish
+
+    custom_objects = {
+        'swish': swish,
+    }
+
+    try:
+        import tensorflow.keras as tfkeras
+        tfkeras.utils.get_custom_objects().update(custom_objects)
+    except ImportError:
+        pass
