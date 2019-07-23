@@ -20,8 +20,23 @@ import sys
 import numpy as np
 
 import tensorflow as tf
-from efficientnet.model import _get_model_by_name
+import efficientnet.keras
 from keras.layers import BatchNormalization, Conv2D, Dense
+
+
+def _get_model_by_name(name, *args, **kwargs):
+    models = {
+        'efficientnet-b0': efficientnet.keras.EfficientNetB0,
+        'efficientnet-b1': efficientnet.keras.EfficientNetB1,
+        'efficientnet-b2': efficientnet.keras.EfficientNetB2,
+        'efficientnet-b3': efficientnet.keras.EfficientNetB3,
+        'efficientnet-b4': efficientnet.keras.EfficientNetB4,
+        'efficientnet-b5': efficientnet.keras.EfficientNetB5,
+    }
+
+    model_fn = models[name]
+    model = model_fn(*args, **kwargs)
+    return model
 
 
 def group_weights(weights):
@@ -73,7 +88,7 @@ def load_weights(model, weights):
 
 
 def convert_tensorflow_model(
-    model_name, model_ckpt, output_file, example_img="misc/panda.jpg", weights_only=True
+        model_name, model_ckpt, output_file, example_img="misc/panda.jpg", weights_only=True
 ):
     """ Loads and saves a TensorFlow model. """
     image_files = [example_img]

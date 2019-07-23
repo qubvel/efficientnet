@@ -1,12 +1,17 @@
 import os
 import sys
 import pytest
-
 import numpy as np
-import efficientnet as efn
 
 from skimage.io import imread
-from keras.models import load_model
+
+sys.path.insert(0, '.')
+if os.environ.get('TF_KERAS'):
+    import efficientnet.tfkeras as efn
+    from tensorflow.keras.models import load_model
+else:
+    import efficientnet.keras as efn
+    from keras.models import load_model
 
 PANDA_PATH = 'misc/panda.jpg'
 
@@ -61,3 +66,7 @@ def test_models_result(args):
     prediction = model.predict(input_)
     assert result[0] == prediction.argmax()
     assert np.allclose(result[1], prediction.max())
+    
+    
+if __name__ == "__main__":
+    pytest.main([__file__])
