@@ -225,7 +225,7 @@ def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix=''):
     ) and block_args.input_filters == block_args.output_filters:
         if drop_rate and (drop_rate > 0):
             x = layers.Dropout(drop_rate,
-                               noise_shape=(None, 1, 1, 1),
+                               noise_shape=(backend.shape(x)[0], 1, 1, 1),
                                name=prefix + 'drop')(x)
         x = layers.add([x, inputs], name=prefix + 'add')
 
