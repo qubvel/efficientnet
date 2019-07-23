@@ -57,7 +57,7 @@ install:
 script:
   - export MKL_THREADING_LAYER="GNU"
   # create models directory to avoid concurrent directory creation at runtime
-  - mkdir ~/.keras/models
+  - mkdir -p ~/.keras/models
   - if [[ "$DOC_ONLY_CHANGED" == "False" ]]; then
       if [[ "$TEST_MODE" == "PEP8" ]]; then
         PYTHONPATH=$PWD:$PYTHONPATH py.test --pep8 -m pep8 -n0;
