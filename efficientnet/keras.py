@@ -1,4 +1,3 @@
-import keras
 from . import inject_keras_modules, init_keras_custom_objects
 from . import model
 

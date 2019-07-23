@@ -27,7 +27,7 @@ from setuptools import find_packages, setup, Command
 
 # Package meta-data.
 NAME = "efficientnet"
-DESCRIPTION = "EfficientNet model re-implementation. Keras."
+DESCRIPTION = "EfficientNet model re-implementation. Keras and TensorFlow Keras."
 URL = "https://github.com/qubvel/efficientnet"
 EMAIL = "qubvel@gmail.com"
 AUTHOR = "Pavel Yakubovskiy"
@@ -116,7 +116,7 @@ setup(
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,
     url=URL,
-    packages=find_packages(exclude=("examples", "misc", "scripts")),
+    packages=find_packages(exclude=("examples", "misc", "scripts", "docker", "tests")),
     # If your package is a single module, use this instead of 'packages':
     # py_modules=['mypackage'],
     # entry_points={
