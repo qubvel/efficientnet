@@ -1,4 +1,4 @@
-# Copyright 2019 The TensorFlow Authors, Pavel Yakubovskiy. All Rights Reserved.
+# Copyright 2019 The TensorFlow Authors, Pavel Yakubovskiy, Björn Barz. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,10 @@
   EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks.
   ICML'19, https://arxiv.org/abs/1905.11946
 """
+
+# Code of this model implementation is mostly written by
+# Björn Barz ([@Callidior](https://github.com/Callidior))
+
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -159,6 +163,7 @@ def get_dropout(**kwargs):
             return tuple(noise_shape)
 
     return FixedDropout
+
 
 def round_filters(filters, width_coefficient, depth_divisor):
     """Round number of filters based on width multiplier."""
