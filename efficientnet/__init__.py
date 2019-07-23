@@ -59,29 +59,24 @@ def inject_tfkeras_modules(func):
 
 
 def init_keras_custom_objects():
-    from .model import swish
+    import keras
+    from . import model
 
     custom_objects = {
-        'swish': swish,
+        'swish': model.swish,
+        'FixedDropout': inject_keras_modules(model.get_dropout)()
     }
 
-    try:
-
-        import keras
-        keras.utils.generic_utils.get_custom_objects().update(custom_objects)
-    except ImportError:
-        pass
+    keras.utils.generic_utils.get_custom_objects().update(custom_objects)
 
 
 def init_tfkeras_custom_objects():
-    from .model import swish
+    import tensorflow.keras as tfkeras
+    from . import model
 
     custom_objects = {
-        'swish': swish,
+        'swish': model.swish,
+        'FixedDropout': inject_tfkeras_modules(model.get_dropout)()
     }
 
-    try:
-        import tensorflow.keras as tfkeras
-        tfkeras.utils.get_custom_objects().update(custom_objects)
-    except ImportError:
-        pass
+    tfkeras.utils.get_custom_objects().update(custom_objects)

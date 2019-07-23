@@ -138,6 +138,28 @@ def swish(x):
     return x * backend.sigmoid(x)
 
 
+def get_dropout(**kwargs):
+    """Wrapper over custom dropout. Fix problem of ``None`` shape for tf.keras.
+    It is not possible to define FixedDropout class as global object,
+    because we do not have modules for inheritance at first time.
+
+    Issue:
+        https://github.com/tensorflow/tensorflow/issues/30946
+    """
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
+    class FixedDropout(layers.Dropout):
+        def _get_noise_shape(self, inputs):
+            if self.noise_shape is None:
+                return self.noise_shape
+
+            symbolic_shape = backend.shape(inputs)
+            noise_shape = [symbolic_shape[axis] if shape is None else shape
+                           for axis, shape in enumerate(self.noise_shape)]
+            return tuple(noise_shape)
+
+    return FixedDropout
+
 def round_filters(filters, width_coefficient, depth_divisor):
     """Round number of filters based on width multiplier."""
 
@@ -156,11 +178,19 @@ def round_repeats(repeats, depth_coefficient):
     return int(math.ceil(depth_coefficient * repeats))
 
 
-def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix=''):
+def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix='', ):
     """Mobile Inverted Residual Bottleneck."""
 
     has_se = (block_args.se_ratio is not None) and (0 < block_args.se_ratio <= 1)
     bn_axis = 3 if backend.image_data_format() == 'channels_last' else 1
+
+    # workaround over non working dropout in tf.keras
+    Dropout = get_dropout(
+        backend=backend,
+        layers=layers,
+        models=models,
+        utils=keras_utils
+    )
 
     # Expansion phase
     filters = block_args.input_filters * block_args.expand_ratio
@@ -224,9 +254,9 @@ def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix=''):
             s == 1 for s in block_args.strides
     ) and block_args.input_filters == block_args.output_filters:
         if drop_rate and (drop_rate > 0):
-            x = layers.Dropout(drop_rate,
-                               noise_shape=(backend.shape(x)[0], 1, 1, 1),
-                               name=prefix + 'drop')(x)
+            x = Dropout(drop_rate,
+                        noise_shape=(None, 1, 1, 1),
+                        name=prefix + 'drop')(x)
         x = layers.add([x, inputs], name=prefix + 'add')
 
     return x
