@@ -41,16 +41,23 @@ EfficientNets achieve state-of-the-art accuracy on ImageNet with an order of mag
 * *Initializing the model*:
 
 ```python
-from efficientnet import EfficientNetB0
+# models can be build with Keras or Tensorflow frameworks
+# use keras and tfkeras modules respectively
+# efficientnet.keras / efficientnet.tfkeras
+import efficientnet.keras as efn 
 
-model = EfficientNetB0(weights='imagenet')
+model = efn.EfficientNetB0(weights='imagenet')
 
 ```
 
 * *Loading the pre-trained weights*:
 
 ```python
-from efficientnet import load_model
+# model use some custom objects, so before loading saved model
+# import module your network was build with
+# e.g. import efficientnet.keras / import efficientnet.tfkeras
+import efficientnet.tfkeras
+from tensorflow.keras.models import load_model
 
 model = load_model('path/to/model.h5')
 ```
@@ -78,7 +85,8 @@ The performance of each model variant using the pre-trained weights converted fr
 
 ### Requirements
 
-* `keras >= 2.2.0` + `tensorflow`
+* `Keras >= 2.2.0` / `TensorFlow >= 1.12.0`
+* `keras_applications >= 1.0.7`
 * `scikit-image`
 
 ### Installing from the source
@@ -108,3 +116,9 @@ You can also optionally create the virtual environment with all the dependencies
 * **Why are B6 and B7 model variants not yet supported?**
 
 Weights for B6-B7 have not been made available yet, but might appear soon. Follow the [issue](https://github.com/tensorflow/tpu/issues/377) for updates.
+
+## Acknowledgements
+I would like to thanks community members who actively contribute to this repository:
+
+1) Sasha Illarionov ([@sdll](https://github.com/sdll)) for preparing automated script for weights conversion
+2) Björn Barz ([@Callidior](https://github.com/Callidior)) for model code adaptation for keras and tensorflow.keras frameworks 
