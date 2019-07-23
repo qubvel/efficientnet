@@ -66,7 +66,7 @@ def test_models_result(args):
     prediction = model.predict(input_)
     assert result[0] == prediction.argmax()
     assert np.allclose(result[1], prediction.max())
-
-
+    
+    
 if __name__ == "__main__":
     pytest.main([__file__])
