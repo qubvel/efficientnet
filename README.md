@@ -12,6 +12,7 @@ The codebase is heavily inspired by the [TensorFlow implementation](https://gith
  3. [Models](#models)
  4. [Installation](#installation)
  5. [Frequently Asked Questions](#frequently-asked-questions)
+ 6. [Acknowledgements](#acknowledgements)
 
 ## About EfficientNet Models
 
