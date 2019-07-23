@@ -1,0 +1,2 @@
+keras_applications>=1.0.7
+scikit-image
