@@ -52,7 +52,7 @@ def center_crop_and_resize(image, image_size, crop_padding=32, interpolation="bi
     return resized_image
 
 
-def preprocess_input(x):
+def preprocess_input(x, **kwargs):
     assert x.ndim in (3, 4)
     assert x.shape[-1] == 3
 
