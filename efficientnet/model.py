@@ -38,6 +38,7 @@ from keras_applications.imagenet_utils import _obtain_input_shape
 from keras_applications.imagenet_utils import decode_predictions
 
 from . import get_submodules_from_kwargs
+from .preprocessing import preprocess_input
 
 backend = None
 layers = None
@@ -189,7 +190,7 @@ def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix='', 
     has_se = (block_args.se_ratio is not None) and (0 < block_args.se_ratio <= 1)
     bn_axis = 3 if backend.image_data_format() == 'channels_last' else 1
 
-    # workaround over non working dropout in tf.keras
+    # workaround over non working dropout with None in noise_shape in tf.keras
     Dropout = get_dropout(
         backend=backend,
         layers=layers,
@@ -226,8 +227,9 @@ def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix='', 
             block_args.input_filters * block_args.se_ratio
         ))
         se_tensor = layers.GlobalAveragePooling2D(name=prefix + 'se_squeeze')(x)
-        se_tensor = layers.Reshape((1, 1, filters),
-                                   name=prefix + 'se_reshape')(se_tensor)
+        
+        target_shape = (1, 1, filters) if backend.image_data_format() == 'channels_last' else (filters, 1, 1)
+        se_tensor = layers.Reshape(target_shape, name=prefix + 'se_reshape')(se_tensor)
         se_tensor = layers.Conv2D(num_reduced_filters, 1,
                                   activation=relu_fn,
                                   padding='same',
