@@ -245,8 +245,10 @@ def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix='', 
         if backend.backend() == 'theano':
             # For the Theano backend, we have to explicitly make
             # the excitation weights broadcastable.
+            pattern = ([True, True, True, False] if backend.image_data_format() == 'channels_last'
+                       else [True, False, True, True])
             se_tensor = layers.Lambda(
-                lambda x: backend.pattern_broadcast(x, [True, True, True, False]),
+                lambda x: backend.pattern_broadcast(x, pattern),
                 name=prefix + 'se_broadcast')(se_tensor)
         x = layers.multiply([x, se_tensor], name=prefix + 'se_excite')
 
