@@ -15,9 +15,6 @@
 import numpy as np
 from skimage.transform import resize
 
-MEAN_RGB = [0.485 * 255, 0.456 * 255, 0.406 * 255]
-STDDEV_RGB = [0.229 * 255, 0.224 * 255, 0.225 * 255]
-
 MAP_INTERPOLATION_TO_ORDER = {
     "nearest": 0,
     "bilinear": 1,
@@ -39,9 +36,9 @@ def center_crop_and_resize(image, image_size, crop_padding=32, interpolation="bi
     offset_width = ((w - padded_center_crop_size) + 1) // 2
 
     image_crop = image[
-        offset_height : padded_center_crop_size + offset_height,
-        offset_width : padded_center_crop_size + offset_width,
-    ]
+                 offset_height: padded_center_crop_size + offset_height,
+                 offset_width: padded_center_crop_size + offset_width,
+                 ]
     resized_image = resize(
         image_crop,
         (image_size, image_size),
@@ -50,4 +47,3 @@ def center_crop_and_resize(image, image_size, crop_padding=32, interpolation="bi
     )
 
     return resized_image
-
