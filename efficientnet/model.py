@@ -36,9 +36,9 @@ import numpy as np
 from six.moves import xrange
 from keras_applications.imagenet_utils import _obtain_input_shape
 from keras_applications.imagenet_utils import decode_predictions
+from keras_applications.imagenet_utils import preprocess_input as _preprocess_input
 
 from . import get_submodules_from_kwargs
-from .preprocessing import preprocess_input
 
 backend = None
 layers = None
@@ -75,9 +75,6 @@ WEIGHTS_HASHES = {
                         '14161a20506013aa229abce8fd994b45'
                         'da76b3a29e1c011635376e191c2c2d54')
 }
-
-MEAN_RGB = [0.485 * 255, 0.456 * 255, 0.406 * 255]
-STDDEV_RGB = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
 BlockArgs = collections.namedtuple('BlockArgs', [
     'kernel_size', 'num_repeat', 'input_filters', 'output_filters',
@@ -125,6 +122,10 @@ DENSE_KERNEL_INITIALIZER = {
         'distribution': 'uniform'
     }
 }
+
+
+def preprocess_input(x, **kwargs):
+    return _preprocess_input(x, mode='torch', **kwargs)
 
 
 def swish(x):
@@ -227,7 +228,7 @@ def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix='', 
             block_args.input_filters * block_args.se_ratio
         ))
         se_tensor = layers.GlobalAveragePooling2D(name=prefix + 'se_squeeze')(x)
-        
+
         target_shape = (1, 1, filters) if backend.image_data_format() == 'channels_last' else (filters, 1, 1)
         se_tensor = layers.Reshape(target_shape, name=prefix + 'se_reshape')(se_tensor)
         se_tensor = layers.Conv2D(num_reduced_filters, 1,
