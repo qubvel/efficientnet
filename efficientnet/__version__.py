@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-VERSION = (0, 0, 4)
+VERSION = (1, 0, '0b1')
 
 __version__ = ".".join(map(str, VERSION))
 
