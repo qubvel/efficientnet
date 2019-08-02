@@ -1,2 +1,2 @@
-keras_applications>=1.0.7
+keras_applications>=1.0.7,<=1.0.8
 scikit-image
