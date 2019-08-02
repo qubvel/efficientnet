@@ -97,13 +97,13 @@ The performance of each model variant using the pre-trained weights converted fr
 ### Installing from the source
 
 ```bash
-pip install -U git+https://github.com/qubvel/efficientnet
+$ pip install -U git+https://github.com/qubvel/efficientnet
 ```
 
 ### Installing from PyPI
 
 ```bash
-pip install -U efficientnet
+$ pip install -U efficientnet
 ```
 
 ## Frequently Asked Questions
@@ -113,7 +113,7 @@ pip install -U efficientnet
 Pick the target directory (like `dist`) and run the [converter script](./scripts) from the repo directory as follows:
 
 ```bash
-./scripts/convert_efficientnet.sh --target_dir dist
+$ ./scripts/convert_efficientnet.sh --target_dir dist
 ```
 
 You can also optionally create the virtual environment with all the dependencies installed by adding `--make_venv=true` and operate in a self-destructing temporary location instead of the target directory by setting `--tmp_working_dir=true`.
