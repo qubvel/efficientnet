@@ -102,8 +102,13 @@ $ pip install -U git+https://github.com/qubvel/efficientnet
 
 ### Installing from PyPI
 
+Stable release
 ```bash
 $ pip install -U efficientnet
+```
+Latest release (with keras and tf.keras support)
+```bash
+$ pip install -U efficientnet==1.0.0b1
 ```
 
 ## Frequently Asked Questions
