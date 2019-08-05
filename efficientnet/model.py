@@ -128,20 +128,23 @@ def preprocess_input(x, **kwargs):
     return _preprocess_input(x, mode='torch', **kwargs)
 
 
-def swish(x):
-    """Swish activation function: x * sigmoid(x).
-    Reference: [Searching for Activation Functions](https://arxiv.org/abs/1710.05941)
-    """
+def get_swish(**kwargs):
+    backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+    def swish(x):
+        """Swish activation function: x * sigmoid(x).
+        Reference: [Searching for Activation Functions](https://arxiv.org/abs/1710.05941)
+        """
 
-    if backend.backend() == 'tensorflow':
-        try:
-            # The native TF implementation has a more
-            # memory-efficient gradient implementation
-            return backend.tf.nn.swish(x)
-        except AttributeError:
-            pass
+        if backend.backend() == 'tensorflow':
+            try:
+                # The native TF implementation has a more
+                # memory-efficient gradient implementation
+                return backend.tf.nn.swish(x)
+            except AttributeError:
+                pass
 
-    return x * backend.sigmoid(x)
+        return x * backend.sigmoid(x)
+    return  swish
 
 
 def get_dropout(**kwargs):
@@ -185,7 +188,7 @@ def round_repeats(repeats, depth_coefficient):
     return int(math.ceil(depth_coefficient * repeats))
 
 
-def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix='', ):
+def mb_conv_block(inputs, block_args, activation, drop_rate=None, prefix='', ):
     """Mobile Inverted Residual Bottleneck."""
 
     has_se = (block_args.se_ratio is not None) and (0 < block_args.se_ratio <= 1)
@@ -208,7 +211,7 @@ def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix='', 
                           kernel_initializer=CONV_KERNEL_INITIALIZER,
                           name=prefix + 'expand_conv')(inputs)
         x = layers.BatchNormalization(axis=bn_axis, name=prefix + 'expand_bn')(x)
-        x = layers.Activation(relu_fn, name=prefix + 'expand_activation')(x)
+        x = layers.Activation(activation, name=prefix + 'expand_activation')(x)
     else:
         x = inputs
 
@@ -220,7 +223,7 @@ def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix='', 
                                depthwise_initializer=CONV_KERNEL_INITIALIZER,
                                name=prefix + 'dwconv')(x)
     x = layers.BatchNormalization(axis=bn_axis, name=prefix + 'bn')(x)
-    x = layers.Activation(relu_fn, name=prefix + 'activation')(x)
+    x = layers.Activation(activation, name=prefix + 'activation')(x)
 
     # Squeeze and Excitation phase
     if has_se:
@@ -232,7 +235,7 @@ def mb_conv_block(inputs, block_args, drop_rate=None, relu_fn=swish, prefix='', 
         target_shape = (1, 1, filters) if backend.image_data_format() == 'channels_last' else (filters, 1, 1)
         se_tensor = layers.Reshape(target_shape, name=prefix + 'se_reshape')(se_tensor)
         se_tensor = layers.Conv2D(num_reduced_filters, 1,
-                                  activation=relu_fn,
+                                  activation=activation,
                                   padding='same',
                                   use_bias=True,
                                   kernel_initializer=CONV_KERNEL_INITIALIZER,
@@ -278,7 +281,6 @@ def EfficientNet(width_coefficient,
                  dropout_rate=0.2,
                  drop_connect_rate=0.2,
                  depth_divisor=8,
-                 relu_fn=swish,
                  blocks_args=DEFAULT_BLOCKS_ARGS,
                  model_name='efficientnet',
                  include_top=True,
@@ -367,6 +369,7 @@ def EfficientNet(width_coefficient,
             img_input = input_tensor
 
     bn_axis = 3 if backend.image_data_format() == 'channels_last' else 1
+    activation = get_swish(**kwargs)
 
     # Build stem
     x = img_input
@@ -377,7 +380,7 @@ def EfficientNet(width_coefficient,
                       kernel_initializer=CONV_KERNEL_INITIALIZER,
                       name='stem_conv')(x)
     x = layers.BatchNormalization(axis=bn_axis, name='stem_bn')(x)
-    x = layers.Activation(relu_fn, name='stem_activation')(x)
+    x = layers.Activation(activation, name='stem_activation')(x)
 
     # Build blocks
     num_blocks_total = sum(block_args.num_repeat for block_args in blocks_args)
@@ -395,7 +398,7 @@ def EfficientNet(width_coefficient,
         # The first block needs to take care of stride and filter size increase.
         drop_rate = drop_connect_rate * float(block_num) / num_blocks_total
         x = mb_conv_block(x, block_args,
-                          relu_fn=relu_fn,
+                          activation=activation,
                           drop_rate=drop_rate,
                           prefix='block{}a_'.format(idx + 1))
         block_num += 1
@@ -411,7 +414,7 @@ def EfficientNet(width_coefficient,
                     string.ascii_lowercase[bidx + 1]
                 )
                 x = mb_conv_block(x, block_args,
-                                  relu_fn=relu_fn,
+                                  activation=activation,
                                   drop_rate=drop_rate,
                                   prefix=block_prefix)
                 block_num += 1
@@ -423,7 +426,7 @@ def EfficientNet(width_coefficient,
                       kernel_initializer=CONV_KERNEL_INITIALIZER,
                       name='top_conv')(x)
     x = layers.BatchNormalization(axis=bn_axis, name='top_bn')(x)
-    x = layers.Activation(relu_fn, name='top_activation')(x)
+    x = layers.Activation(activation, name='top_activation')(x)
     if include_top:
         x = layers.GlobalAveragePooling2D(name='avg_pool')(x)
         if dropout_rate and dropout_rate > 0:
