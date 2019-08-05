@@ -63,7 +63,7 @@ def init_keras_custom_objects():
     from . import model
 
     custom_objects = {
-        'swish': model.swish,
+        'swish': inject_keras_modules(model.get_swish)(),
         'FixedDropout': inject_keras_modules(model.get_dropout)()
     }
 
@@ -75,7 +75,7 @@ def init_tfkeras_custom_objects():
     from . import model
 
     custom_objects = {
-        'swish': model.swish,
+        'swish': inject_tfkeras_modules(model.get_swish)(),
         'FixedDropout': inject_tfkeras_modules(model.get_dropout)()
     }
 
