@@ -16,12 +16,14 @@ else:
 PANDA_PATH = 'misc/panda.jpg'
 
 PANDA_ARGS = [
-    (efn.EfficientNetB0, (388, 0.8347934)),
-    (efn.EfficientNetB1, (388, 0.8702488)),
-    (efn.EfficientNetB2, (388, 0.8227086)),
-    (efn.EfficientNetB3, (388, 0.8152614)),
-    (efn.EfficientNetB4, (388, 0.7353228)),
-    (efn.EfficientNetB5, (388, 0.8103732)),
+    (efn.EfficientNetB0, (388, 0.7587869)),
+    (efn.EfficientNetB1, (388, 0.8373562)),
+    (efn.EfficientNetB2, (388, 0.8569102)),
+    (efn.EfficientNetB3, (388, 0.8761664)),
+    (efn.EfficientNetB4, (388, 0.7342420)),
+    (efn.EfficientNetB5, (388, 0.8810669)),
+    (efn.EfficientNetB6, (388, 0.8667784)),
+    (efn.EfficientNetB7, (388, 0.8399882)),
 ]
 
 
