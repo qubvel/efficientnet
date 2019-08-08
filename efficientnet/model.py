@@ -50,30 +50,38 @@ BASE_WEIGHTS_PATH = (
     'releases/download/efficientnet/')
 
 WEIGHTS_HASHES = {
-    'efficientnet-b0': ('dd631faed10515e2cd08e3b5da0624b3'
-                        'f50d523fe69b9b5fdf037365f9f907f0',
-                        'e5649d29a9f2dd60380dd05d63389666'
-                        '1c36e1f9596e302a305f9ff1774c1bc8'),
-    'efficientnet-b1': ('3b88771863db84f3ddea6d722a818719'
-                        '04e0fa6288869a0adaa85059094974bb',
-                        '5b47361e17c7bd1d21e42add4456960c'
-                        '9312f71b57b9f6d548e85b7ad9243bdf'),
-    'efficientnet-b2': ('e78c89b8580d907238fd45f8ef200131'
-                        '95d198d16135fadc80650b2453f64f6c',
-                        'ac3c2de4e43096d2979909dd9ec22119'
-                        'c3a34a9fd3cbda9977c1d05f7ebcede9'),
-    'efficientnet-b3': ('99725ac825f7ddf5e47c05d333d9fb62'
-                        '3faf1640c0b0c7372f855804e1861508',
-                        'e70d7ea35fa684f9046e6cc62783940b'
-                        'd83d16edc238807fb75c73105d7ffbaa'),
-    'efficientnet-b4': ('242890effb990b11fdcc91fceb59cd74'
-                        '9388c6b712c96dfb597561d6dae3060a',
-                        'eaa6455c773db0f2d4d097f7da771bb7'
-                        '25dd8c993ac6f4553b78e12565999fc1'),
-    'efficientnet-b5': ('c4cb66916633b7311688dbcf6ed5c35e'
-                        '45ce06594181066015c001103998dc67',
-                        '14161a20506013aa229abce8fd994b45'
-                        'da76b3a29e1c011635376e191c2c2d54')
+    'efficientnet-b0': ('163292582f1c6eaca8e7dc7b51b01c61'
+                        '5b0dbc0039699b4dcd0b975cc21533dc',
+                        'c1421ad80a9fc67c2cc4000f666aa507'
+                        '89ce39eedb4e06d531b0c593890ccff3'),
+    'efficientnet-b1': ('d0a71ddf51ef7a0ca425bab32b7fa7f1'
+                        '6043ee598ecee73fc674d9560c8f09b0',
+                        '75de265d03ac52fa74f2f510455ba64f'
+                        '9c7c5fd96dc923cd4bfefa3d680c4b68'),
+    'efficientnet-b2': ('bb5451507a6418a574534aa76a91b106'
+                        'f6b605f3b5dde0b21055694319853086',
+                        '433b60584fafba1ea3de07443b74cfd3'
+                        '2ce004a012020b07ef69e22ba8669333'),
+    'efficientnet-b3': ('03f1fba367f070bd2545f081cfa7f3e7'
+                        '6f5e1aa3b6f4db700f00552901e75ab9',
+                        'c5d42eb6cfae8567b418ad3845cfd63a'
+                        'a48b87f1bd5df8658a49375a9f3135c7'),
+    'efficientnet-b4': ('98852de93f74d9833c8640474b2c698d'
+                        'b45ec60690c75b3bacb1845e907bf94f',
+                        '7942c1407ff1feb34113995864970cd4'
+                        'd9d91ea64877e8d9c38b6c1e0767c411'),
+    'efficientnet-b5': ('30172f1d45f9b8a41352d4219bf930ee'
+                        '3339025fd26ab314a817ba8918fefc7d',
+                        '9d197bc2bfe29165c10a2af8c2ebc675'
+                        '07f5d70456f09e584c71b822941b1952'),
+    'efficientnet-b6': ('f5270466747753485a082092ac9939ca'
+                        'a546eb3f09edca6d6fff842cad938720',
+                        '1d0923bb038f2f8060faaf0a0449db4b'
+                        '96549a881747b7c7678724ac79f427ed'),
+    'efficientnet-b7': ('876a41319980638fa597acbbf956a82d'
+                        '10819531ff2dcb1a52277f10c7aefa1a',
+                        '60b56ff3a8daccc8d96edfd40b204c11'
+                        '3e51748da657afd58034d54d3cec2bac')
 }
 
 BlockArgs = collections.namedtuple('BlockArgs', [
@@ -347,11 +355,6 @@ def EfficientNet(width_coefficient,
         raise ValueError('If using `weights` as `"imagenet"` with `include_top`'
                          ' as true, `classes` should be 1000')
 
-    if weights == 'imagenet' and (model_name not in WEIGHTS_HASHES):
-        raise ValueError('Pre-trained weights are only available for '
-                         'EfficientNet-B0 to -B5, but you requested weights for ' +
-                         model_name + '.')
-
     # Determine proper input shape
     input_shape = _obtain_input_shape(input_shape,
                                       default_size=default_resolution,
@@ -454,10 +457,10 @@ def EfficientNet(width_coefficient,
     # Load weights.
     if weights == 'imagenet':
         if include_top:
-            file_name = model_name + '_weights_tf_dim_ordering_tf_kernels.h5'
+            file_name = model_name + '_weights_tf_dim_ordering_tf_kernels_autoaugment.h5'
             file_hash = WEIGHTS_HASHES[model_name][0]
         else:
-            file_name = model_name + '_weights_tf_dim_ordering_tf_kernels_notop.h5'
+            file_name = model_name + '_weights_tf_dim_ordering_tf_kernels_autoaugment_notop.h5'
             file_hash = WEIGHTS_HASHES[model_name][1]
         weights_path = keras_utils.get_file(file_name,
                                             BASE_WEIGHTS_PATH + file_name,
