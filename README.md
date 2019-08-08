@@ -73,16 +73,16 @@ See the complete example of loading the model and making an inference in the Jup
 
 The performance of each model variant using the pre-trained weights converted from checkpoints provided by the authors is as follows:
 
-| Architecture   | @top1* | @top5* | Weights |
-| -------------- | :----: | :----: | :-----: |
-| EfficientNetB0 | 0.7668 | 0.9312 |    +    |
-| EfficientNetB1 | 0.7863 | 0.9418 |    +    |
-| EfficientNetB2 | 0.7968 | 0.9475 |    +    |
-| EfficientNetB3 | 0.8083 | 0.9531 |    +    |
-| EfficientNetB4 | 0.8259 | 0.9612 |    +    |
-| EfficientNetB5 | 0.8309 | 0.9646 |    +    |
-| EfficientNetB6 |   -    |   -    |    -    |
-| EfficientNetB7 |   -    |   -    |    -    |
+| Architecture   | @top1* |
+| -------------- | :----: |
+| EfficientNetB0 | 0.772  |
+| EfficientNetB1 | 0.791  |
+| EfficientNetB2 | 0.802  |
+| EfficientNetB3 | 0.816  |
+| EfficientNetB4 | 0.830  |
+| EfficientNetB5 | 0.837  |
+| EfficientNetB6 | 0.841  |
+| EfficientNetB7 | 0.844  |
 
 **\*** - topK accuracy score for converted models (imagenet `val` set)
 
@@ -122,10 +122,6 @@ $ ./scripts/convert_efficientnet.sh --target_dir dist
 ```
 
 You can also optionally create the virtual environment with all the dependencies installed by adding `--make_venv=true` and operate in a self-destructing temporary location instead of the target directory by setting `--tmp_working_dir=true`.
-
-* **Why are B6 and B7 model variants not yet supported?**
-
-Weights for B6-B7 have not been made available yet, but might appear soon. Follow the [issue](https://github.com/tensorflow/tpu/issues/377) for updates.
 
 ## Acknowledgements
 I would like to thanks community members who actively contribute to this repository:
