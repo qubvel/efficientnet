@@ -108,7 +108,7 @@ $ pip install -U efficientnet
 ```
 Latest release (with keras and tf.keras support)
 ```bash
-$ pip install -U efficientnet==1.0.0b1
+$ pip install -U efficientnet==1.0.0b2
 ```
 
 ## Frequently Asked Questions
