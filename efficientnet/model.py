@@ -133,6 +133,7 @@ DENSE_KERNEL_INITIALIZER = {
 
 
 def preprocess_input(x, **kwargs):
+    kwargs = {k: v for k, v in kwargs.items() if k in ['backend', 'layers', 'models', 'utils']}
     return _preprocess_input(x, mode='torch', **kwargs)
 
 
