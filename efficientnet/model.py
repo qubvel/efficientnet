@@ -478,6 +478,19 @@ def EfficientNet(width_coefficient,
     return model
 
 
+def EfficientNetBn(n, *args, **kwargs):
+    return [
+        EfficientNetB0,
+        EfficientNetB1,
+        EfficientNetB2,
+        EfficientNetB3,
+        EfficientNetB4,
+        EfficientNetB5,
+        EfficientNetB6,
+        EfficientNetB7,
+    ][n](*args, **kwargs)
+
+
 def EfficientNetB0(include_top=True,
                    weights='imagenet',
                    input_tensor=None,
