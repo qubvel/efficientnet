@@ -17,8 +17,6 @@
 import argparse
 import sys
 
-import numpy as np
-
 import tensorflow as tf
 import efficientnet.keras
 from keras.layers import BatchNormalization, Conv2D, Dense
@@ -149,15 +147,15 @@ if __name__ == "__main__":
         default="true",
         help="Whether to include metadata in the serialized Keras model",
     )
-    args = parser.parse_args()
+    cli_args = parser.parse_args()
 
-    sys.path.append(args.source)
+    sys.path.append(cli_args.source)
     import eval_ckpt_main
 
     true_values = ("yes", "true", "t", "1", "y")
     convert_tensorflow_model(
-        model_name=args.model_name,
-        model_ckpt=args.tf_checkpoint,
-        output_file=args.output_file,
-        weights_only=args.weights_only in true_values,
+        model_name=cli_args.model_name,
+        model_ckpt=cli_args.tf_checkpoint,
+        output_file=cli_args.output_file,
+        weights_only=cli_args.weights_only in true_values,
     )
