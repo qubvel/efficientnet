@@ -17,8 +17,6 @@
 import argparse
 import sys
 
-import numpy as np
-
 import tensorflow as tf
 import efficientnet.keras
 from keras.layers import BatchNormalization, Conv2D, Dense
@@ -93,14 +91,14 @@ def convert_tensorflow_model(
     """ Loads and saves a TensorFlow model. """
     image_files = [example_img]
     eval_ckpt_driver = eval_ckpt_main.EvalCkptDriver(model_name)
-    with tf.Graph().as_default(), tf.Session() as sess:
+    with tf.Graph().as_default(), tf.compat.v1.Session() as sess:
         images, _ = eval_ckpt_driver.build_dataset(
             image_files, [0] * len(image_files), False
         )
         eval_ckpt_driver.build_model(images, is_training=False)
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         eval_ckpt_driver.restore_model(sess, model_ckpt)
-        global_variables = tf.global_variables()
+        global_variables = tf.compat.v1.global_variables()
         weights = dict()
         for variable in global_variables:
             try:
@@ -149,15 +147,15 @@ if __name__ == "__main__":
         default="true",
         help="Whether to include metadata in the serialized Keras model",
     )
-    args = parser.parse_args()
+    cli_args = parser.parse_args()
 
-    sys.path.append(args.source)
+    sys.path.append(cli_args.source)
     import eval_ckpt_main
 
     true_values = ("yes", "true", "t", "1", "y")
     convert_tensorflow_model(
-        model_name=args.model_name,
-        model_ckpt=args.tf_checkpoint,
-        output_file=args.output_file,
-        weights_only=args.weights_only in true_values,
+        model_name=cli_args.model_name,
+        model_ckpt=cli_args.tf_checkpoint,
+        output_file=cli_args.output_file,
+        weights_only=cli_args.weights_only in true_values,
     )

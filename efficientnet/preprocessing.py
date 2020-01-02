@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ==============================================================================
-import numpy as np
+
 from skimage.transform import resize
 
 MAP_INTERPOLATION_TO_ORDER = {

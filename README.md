@@ -25,10 +25,10 @@ EfficientNets rely on AutoML and compound scaling to achieve superior performanc
 <table border="0">
 <tr>
     <td>
-    <img src="https://raw.githubusercontent.com/tensorflow/tpu/master/models/official/efficientnet/g3doc/params.png" width="100%" />
+    <img src="https://raw.githubusercontent.com/tensorflow/tpu/master/models/official/efficientnet/g3doc/params.png" alt="Params" width="100%" />
     </td>
     <td>
-    <img src="https://raw.githubusercontent.com/tensorflow/tpu/master/models/official/efficientnet/g3doc/flops.png", width="90%" />
+    <img src="https://raw.githubusercontent.com/tensorflow/tpu/master/models/official/efficientnet/g3doc/flops.png" alt="Flops" width="90%" />
     </td>
 </tr>
 </table>
