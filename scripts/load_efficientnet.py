@@ -32,6 +32,9 @@ def _get_model_by_name(name, *args, **kwargs):
         'efficientnet-b3': efficientnet.keras.EfficientNetB3,
         'efficientnet-b4': efficientnet.keras.EfficientNetB4,
         'efficientnet-b5': efficientnet.keras.EfficientNetB5,
+        'efficientnet-b6': efficientnet.keras.EfficientNetB6,
+        'efficientnet-b7': efficientnet.keras.EfficientNetB7,
+        'efficientnet-l2': efficientnet.keras.EfficientNetL2,
     }
 
     model_fn = models[name]
@@ -88,9 +91,10 @@ def load_weights(model, weights):
 
 
 def convert_tensorflow_model(
-        model_name, model_ckpt, output_file, example_img="misc/panda.jpg", weights_only=True
+        model_name, model_ckpt, output_file, example_img="misc/panda.jpg", weights_only=True, include_top=True
 ):
     """ Loads and saves a TensorFlow model. """
+    print('include_top=',include_top)
     image_files = [example_img]
     eval_ckpt_driver = eval_ckpt_main.EvalCkptDriver(model_name)
     with tf.Graph().as_default(), tf.Session() as sess:
@@ -99,6 +103,7 @@ def convert_tensorflow_model(
         )
         eval_ckpt_driver.build_model(images, is_training=False)
         sess.run(tf.global_variables_initializer())
+        print(model_ckpt)
         eval_ckpt_driver.restore_model(sess, model_ckpt)
         global_variables = tf.global_variables()
         weights = dict()
@@ -108,7 +113,7 @@ def convert_tensorflow_model(
             except:
                 print(f"Skipping variable {variable.name}, an exception occurred")
     model = _get_model_by_name(
-        model_name, include_top=True, input_shape=None, weights=None, classes=1000
+        model_name, include_top=include_top, input_shape=None, weights=None, classes=1000
     )
     load_weights(model, weights)
     output_file = f"{output_file}.h5"
@@ -149,6 +154,13 @@ if __name__ == "__main__":
         default="true",
         help="Whether to include metadata in the serialized Keras model",
     )
+    parser.add_argument(
+        "--include_top",
+        type=str,
+        default="true",
+        help="Whether to include top layer",
+    )
+    
     args = parser.parse_args()
 
     sys.path.append(args.source)
@@ -160,4 +172,5 @@ if __name__ == "__main__":
         model_ckpt=args.tf_checkpoint,
         output_file=args.output_file,
         weights_only=args.weights_only in true_values,
+        include_top=args.include_top in true_values,
     )
