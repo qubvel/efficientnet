@@ -88,11 +88,37 @@ The performance of each model variant using the pre-trained weights converted fr
 
 ## Installation
 
-### Requirements
+### Python Requirements
 
-* `Keras >= 2.2.0` / `TensorFlow >= 1.12.0`
+* `TensorFlow >= 1.14.0` - as the current versions of efficientnet rely on pacakges
+   not avaiable in previous releases.
+* `Keras >= 2.2.0`
 * `keras_applications >= 1.0.7`
 * `scikit-image`
+
+### Other Requirements
+
+* `aria2`
+
+For Ubuntu/Linux Mint/Debian Based Systems:
+
+```bash
+sudo apt-get install aria2
+```
+
+For CentOS/Fedora Systems:
+
+```bash
+sudo yum install aria2
+```
+
+For Manjaro/Arch Systems:
+```bash
+$ sudo pacman -Sy aria2
+```
+
+Or find the most recent releases on the aria2 github repository:
+https://github.com/aria2/aria2/releases
 
 ### Installing from the source
 
@@ -121,10 +147,13 @@ $ pip install -U --pre efficientnet
 Pick the target directory (like `dist`) and run the [converter script](./scripts) from the repo directory as follows:
 
 ```bash
-$ ./scripts/convert_efficientnet.sh --target_dir dist
+$ ./scripts/convert_from_tf_to_keras.sh --target_dir dist
 ```
 
-You can also optionally create the virtual environment with all the dependencies installed by adding `--make_venv=true` and operate in a self-destructing temporary location instead of the target directory by setting `--tmp_working_dir=true`.
+You can also optionally:
+* Create a virtual environment with all the dependencies installed by adding `--make_venv=true`
+* Operate in a self-destructing temporary location instead of the target directory by setting `--tmp_working_dir=true`
+* Create a .h5 model file containing both configuration and weights by adding "false"
 
 ## Acknowledgements
 I would like to thanks community members who actively contribute to this repository:
