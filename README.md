@@ -1,12 +1,14 @@
 # EfficientNet Keras (and TensorFlow Keras)
 
+[![PyPI version](https://badge.fury.io/py/efficientnet.svg)](https://badge.fury.io/py/efficientnet) [![Downloads](https://pepy.tech/badge/efficientnet/month)](https://pepy.tech/project/efficientnet/month)
+
 This repository contains a Keras (and TensorFlow Keras) reimplementation of **EfficientNet**, a lightweight convolutional neural network architecture achieving the [state-of-the-art accuracy with an order of magnitude fewer parameters and FLOPS](https://arxiv.org/abs/1905.11946), on both ImageNet and
 five other commonly used transfer learning datasets.
 
 The codebase is heavily inspired by the [TensorFlow implementation](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet).
 
 ## Important!
-There was a huge library update **24 of July**. Now efficintnet works with both frameworks: `keras` and `tensorflow.keras`.
+There was a huge library update **24 of July 2019**. Now efficintnet works with both frameworks: `keras` and `tensorflow.keras`.
 If you have models, trained before that date, to load them, please, use efficientnet of 0.0.4 version (PyPI). You can roll back using `pip install -U efficientnet==0.0.4`.
 
 ## Table of Contents
