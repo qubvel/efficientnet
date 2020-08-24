@@ -67,8 +67,11 @@ def init_keras_custom_objects():
         'swish': inject_keras_modules(model.get_swish)(),
         'FixedDropout': inject_keras_modules(model.get_dropout)()
     }
-
-    keras.utils.generic_utils.get_custom_objects().update(custom_objects)
+    
+    try:
+        keras.utils.generic_utils.get_custom_objects().update(custom_objects)
+    except AttributeError:
+        keras.utils.get_custom_objects().update(custom_objects)
 
 
 def init_tfkeras_custom_objects():
