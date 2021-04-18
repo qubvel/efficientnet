@@ -8,7 +8,7 @@ five other commonly used transfer learning datasets.
 The codebase is heavily inspired by the [TensorFlow implementation](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet).
 
 ## Important!
-There was a huge library update **24 of July 2019**. Now efficintnet works with both frameworks: `keras` and `tensorflow.keras`.
+There was a huge library update **24 of July 2019**. Now efficientnet works with both frameworks: `keras` and `tensorflow.keras`.
 If you have models, trained before that date, to load them, please, use efficientnet of 0.0.4 version (PyPI). You can roll back using `pip install -U efficientnet==0.0.4`.
 
 ## Table of Contents
