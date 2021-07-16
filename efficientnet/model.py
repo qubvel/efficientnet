@@ -352,7 +352,8 @@ def EfficientNet(width_coefficient,
     x = layers.Activation(activation, name='stem_activation')(x)
 
     # Build blocks
-    num_blocks_total = sum(block_args.num_repeat for block_args in blocks_args)
+    num_blocks_total = sum(round_repeats(block_args.num_repeat,
+                                         depth_coefficient) for block_args in blocks_args)
     block_num = 0
     for idx, block_args in enumerate(blocks_args):
         assert block_args.num_repeat > 0
