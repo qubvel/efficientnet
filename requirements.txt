@@ -1,2 +1,4 @@
+tensorflow>=1.14
+keras>=2.20
 keras_applications>=1.0.7,<=1.0.8
 scikit-image

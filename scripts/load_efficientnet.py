@@ -93,14 +93,14 @@ def convert_tensorflow_model(
     """ Loads and saves a TensorFlow model. """
     image_files = [example_img]
     eval_ckpt_driver = eval_ckpt_main.EvalCkptDriver(model_name)
-    with tf.Graph().as_default(), tf.Session() as sess:
+    with tf.Graph().as_default(), tf.compat.v1.Session() as sess:
         images, _ = eval_ckpt_driver.build_dataset(
             image_files, [0] * len(image_files), False
         )
         eval_ckpt_driver.build_model(images, is_training=False)
-        sess.run(tf.global_variables_initializer())
+        sess.run(tf.compat.v1.global_variables_initializer())
         eval_ckpt_driver.restore_model(sess, model_ckpt)
-        global_variables = tf.global_variables()
+        global_variables = tf.compat.v1.global_variables()
         weights = dict()
         for variable in global_variables:
             try:
