@@ -94,7 +94,7 @@ The performance of each model variant using the pre-trained weights converted fr
 
 * `Keras >= 2.2.0` / `TensorFlow >= 1.12.0`
 * `keras_applications >= 1.0.7`
-* `scikit-image`
+* `opencv >= 3.4.2` or `scikit-image` (for resizing images; `opencv` seems to be faster)
 
 ### Installing from the source
 
