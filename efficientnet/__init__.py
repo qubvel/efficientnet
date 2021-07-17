@@ -34,7 +34,7 @@ def get_submodules_from_kwargs(kwargs):
 
 
 def inject_keras_modules(func):
-    import keras
+    from tensorflow import keras
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
         kwargs['backend'] = keras.backend
@@ -60,7 +60,7 @@ def inject_tfkeras_modules(func):
 
 
 def init_keras_custom_objects():
-    import keras
+    from tensorflow import keras
     from . import model
 
     custom_objects = {
