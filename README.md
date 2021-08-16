@@ -1,13 +1,15 @@
 # EfficientNet Keras (and TensorFlow Keras)
 
+[![PyPI version](https://badge.fury.io/py/efficientnet.svg)](https://badge.fury.io/py/efficientnet) [![Downloads](https://pepy.tech/badge/efficientnet/month)](https://pepy.tech/project/efficientnet/month)
+
 This repository contains a Keras (and TensorFlow Keras) reimplementation of **EfficientNet**, a lightweight convolutional neural network architecture achieving the [state-of-the-art accuracy with an order of magnitude fewer parameters and FLOPS](https://arxiv.org/abs/1905.11946), on both ImageNet and
 five other commonly used transfer learning datasets.
 
 The codebase is heavily inspired by the [TensorFlow implementation](https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet).
 
 ## Important!
-There was a huge library update **24 of July**. Now efficintnet works with both frameworks: `keras` and `tensorflow.keras`.
-If you have models, trained before that date, to load them, please, use efficientnet of 0.0.4 version (PyPI). You can roll back using `pip install -U efficientnet==0.0.4`.
+There was a huge library update on **24th of July 2019**. Now efficientnet works with both frameworks: `keras` and `tensorflow.keras`.
+If you have models trained before that date, please use efficientnet of version 0.0.4 to load them. You can roll back using `pip install -U efficientnet==0.0.4` or `pip install -U git+https://github.com/qubvel/efficientnet/tree/v0.0.4`.
 
 ## Table of Contents
 
@@ -51,7 +53,7 @@ EfficientNets achieve state-of-the-art accuracy on ImageNet with an order of mag
 # efficientnet.keras / efficientnet.tfkeras
 import efficientnet.keras as efn 
 
-model = efn.EfficientNetB0(weights='imagenet')
+model = efn.EfficientNetB0(weights='imagenet')  # or weights='noisy-student'
 
 ```
 
@@ -73,16 +75,16 @@ See the complete example of loading the model and making an inference in the Jup
 
 The performance of each model variant using the pre-trained weights converted from checkpoints provided by the authors is as follows:
 
-| Architecture   | @top1* |
-| -------------- | :----: |
-| EfficientNetB0 | 0.772  |
-| EfficientNetB1 | 0.791  |
-| EfficientNetB2 | 0.802  |
-| EfficientNetB3 | 0.816  |
-| EfficientNetB4 | 0.830  |
-| EfficientNetB5 | 0.837  |
-| EfficientNetB6 | 0.841  |
-| EfficientNetB7 | 0.844  |
+| Architecture   | @top1* Imagenet| @top1* Noisy-Student| 
+| -------------- | :----: |:---:|
+| EfficientNetB0 | 0.772  |0.788|
+| EfficientNetB1 | 0.791  |0.815|
+| EfficientNetB2 | 0.802  |0.824|
+| EfficientNetB3 | 0.816  |0.841|
+| EfficientNetB4 | 0.830  |0.853|
+| EfficientNetB5 | 0.837  |0.861|
+| EfficientNetB6 | 0.841  |0.864|
+| EfficientNetB7 | 0.844  |0.869|
 
 **\*** - topK accuracy score for converted models (imagenet `val` set)
 

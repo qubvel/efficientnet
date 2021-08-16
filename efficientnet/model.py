@@ -27,62 +27,21 @@ from __future__ import division
 from __future__ import print_function
 
 import os
-import json
 import math
 import string
 import collections
-import numpy as np
 
 from six.moves import xrange
 from keras_applications.imagenet_utils import _obtain_input_shape
-from keras_applications.imagenet_utils import decode_predictions
 from keras_applications.imagenet_utils import preprocess_input as _preprocess_input
 
 from . import get_submodules_from_kwargs
+from .weights import IMAGENET_WEIGHTS_PATH, IMAGENET_WEIGHTS_HASHES, NS_WEIGHTS_HASHES, NS_WEIGHTS_PATH
 
 backend = None
 layers = None
 models = None
 keras_utils = None
-
-BASE_WEIGHTS_PATH = (
-    'https://github.com/Callidior/keras-applications/'
-    'releases/download/efficientnet/')
-
-WEIGHTS_HASHES = {
-    'efficientnet-b0': ('163292582f1c6eaca8e7dc7b51b01c61'
-                        '5b0dbc0039699b4dcd0b975cc21533dc',
-                        'c1421ad80a9fc67c2cc4000f666aa507'
-                        '89ce39eedb4e06d531b0c593890ccff3'),
-    'efficientnet-b1': ('d0a71ddf51ef7a0ca425bab32b7fa7f1'
-                        '6043ee598ecee73fc674d9560c8f09b0',
-                        '75de265d03ac52fa74f2f510455ba64f'
-                        '9c7c5fd96dc923cd4bfefa3d680c4b68'),
-    'efficientnet-b2': ('bb5451507a6418a574534aa76a91b106'
-                        'f6b605f3b5dde0b21055694319853086',
-                        '433b60584fafba1ea3de07443b74cfd3'
-                        '2ce004a012020b07ef69e22ba8669333'),
-    'efficientnet-b3': ('03f1fba367f070bd2545f081cfa7f3e7'
-                        '6f5e1aa3b6f4db700f00552901e75ab9',
-                        'c5d42eb6cfae8567b418ad3845cfd63a'
-                        'a48b87f1bd5df8658a49375a9f3135c7'),
-    'efficientnet-b4': ('98852de93f74d9833c8640474b2c698d'
-                        'b45ec60690c75b3bacb1845e907bf94f',
-                        '7942c1407ff1feb34113995864970cd4'
-                        'd9d91ea64877e8d9c38b6c1e0767c411'),
-    'efficientnet-b5': ('30172f1d45f9b8a41352d4219bf930ee'
-                        '3339025fd26ab314a817ba8918fefc7d',
-                        '9d197bc2bfe29165c10a2af8c2ebc675'
-                        '07f5d70456f09e584c71b822941b1952'),
-    'efficientnet-b6': ('f5270466747753485a082092ac9939ca'
-                        'a546eb3f09edca6d6fff842cad938720',
-                        '1d0923bb038f2f8060faaf0a0449db4b'
-                        '96549a881747b7c7678724ac79f427ed'),
-    'efficientnet-b7': ('876a41319980638fa597acbbf956a82d'
-                        '10819531ff2dcb1a52277f10c7aefa1a',
-                        '60b56ff3a8daccc8d96edfd40b204c11'
-                        '3e51748da657afd58034d54d3cec2bac')
-}
 
 BlockArgs = collections.namedtuple('BlockArgs', [
     'kernel_size', 'num_repeat', 'input_filters', 'output_filters',
@@ -139,6 +98,7 @@ def preprocess_input(x, **kwargs):
 
 def get_swish(**kwargs):
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
+
     def swish(x):
         """Swish activation function: x * sigmoid(x).
         Reference: [Searching for Activation Functions](https://arxiv.org/abs/1710.05941)
@@ -153,7 +113,8 @@ def get_swish(**kwargs):
                 pass
 
         return x * backend.sigmoid(x)
-    return  swish
+
+    return swish
 
 
 def get_dropout(**kwargs):
@@ -346,7 +307,7 @@ def EfficientNet(width_coefficient,
     global backend, layers, models, keras_utils
     backend, layers, models, keras_utils = get_submodules_from_kwargs(kwargs)
 
-    if not (weights in {'imagenet', None} or os.path.exists(weights)):
+    if not (weights in {'imagenet', 'noisy-student', None} or os.path.exists(weights)):
         raise ValueError('The `weights` argument should be either '
                          '`None` (random initialization), `imagenet` '
                          '(pre-training on ImageNet), '
@@ -391,7 +352,8 @@ def EfficientNet(width_coefficient,
     x = layers.Activation(activation, name='stem_activation')(x)
 
     # Build blocks
-    num_blocks_total = sum(block_args.num_repeat for block_args in blocks_args)
+    num_blocks_total = sum(round_repeats(block_args.num_repeat,
+                                         depth_coefficient) for block_args in blocks_args)
     block_num = 0
     for idx, block_args in enumerate(blocks_args):
         assert block_args.num_repeat > 0
@@ -461,51 +423,79 @@ def EfficientNet(width_coefficient,
 
     # Load weights.
     if weights == 'imagenet':
+
         if include_top:
             file_name = model_name + '_weights_tf_dim_ordering_tf_kernels_autoaugment.h5'
-            file_hash = WEIGHTS_HASHES[model_name][0]
+            file_hash = IMAGENET_WEIGHTS_HASHES[model_name][0]
         else:
             file_name = model_name + '_weights_tf_dim_ordering_tf_kernels_autoaugment_notop.h5'
-            file_hash = WEIGHTS_HASHES[model_name][1]
-        weights_path = keras_utils.get_file(file_name,
-                                            BASE_WEIGHTS_PATH + file_name,
-                                            cache_subdir='models',
-                                            file_hash=file_hash)
+            file_hash = IMAGENET_WEIGHTS_HASHES[model_name][1]
+        weights_path = keras_utils.get_file(
+            file_name,
+            IMAGENET_WEIGHTS_PATH + file_name,
+            cache_subdir='models',
+            file_hash=file_hash,
+        )
         model.load_weights(weights_path)
+
+    elif weights == 'noisy-student':
+
+        if include_top:
+            file_name = "{}_{}.h5".format(model_name, weights)
+            file_hash = NS_WEIGHTS_HASHES[model_name][0]
+        else:
+            file_name = "{}_{}_notop.h5".format(model_name, weights)
+            file_hash = NS_WEIGHTS_HASHES[model_name][1]
+        weights_path = keras_utils.get_file(
+            file_name,
+            NS_WEIGHTS_PATH + file_name,
+            cache_subdir='models',
+            file_hash=file_hash,
+        )
+        model.load_weights(weights_path)
+
     elif weights is not None:
         model.load_weights(weights)
 
     return model
 
 
-def EfficientNetB0(include_top=True,
-                   weights='imagenet',
-                   input_tensor=None,
-                   input_shape=None,
-                   pooling=None,
-                   classes=1000,
-                   **kwargs):
-    return EfficientNet(1.0, 1.0, 224, 0.2,
-                        model_name='efficientnet-b0',
-                        include_top=include_top, weights=weights,
-                        input_tensor=input_tensor, input_shape=input_shape,
-                        pooling=pooling, classes=classes,
-                        **kwargs)
+def EfficientNetB0(
+        include_top=True,
+        weights='imagenet',
+        input_tensor=None,
+        input_shape=None,
+        pooling=None,
+        classes=1000,
+        **kwargs
+):
+    return EfficientNet(
+        1.0, 1.0, 224, 0.2,
+        model_name='efficientnet-b0',
+        include_top=include_top, weights=weights,
+        input_tensor=input_tensor, input_shape=input_shape,
+        pooling=pooling, classes=classes,
+        **kwargs
+    )
 
 
-def EfficientNetB1(include_top=True,
-                   weights='imagenet',
-                   input_tensor=None,
-                   input_shape=None,
-                   pooling=None,
-                   classes=1000,
-                   **kwargs):
-    return EfficientNet(1.0, 1.1, 240, 0.2,
-                        model_name='efficientnet-b1',
-                        include_top=include_top, weights=weights,
-                        input_tensor=input_tensor, input_shape=input_shape,
-                        pooling=pooling, classes=classes,
-                        **kwargs)
+def EfficientNetB1(
+        include_top=True,
+        weights='imagenet',
+        input_tensor=None,
+        input_shape=None,
+        pooling=None,
+        classes=1000,
+        **kwargs
+):
+    return EfficientNet(
+        1.0, 1.1, 240, 0.2,
+        model_name='efficientnet-b1',
+        include_top=include_top, weights=weights,
+        input_tensor=input_tensor, input_shape=input_shape,
+        pooling=pooling, classes=classes,
+        **kwargs
+    )
 
 
 def EfficientNetB2(include_top=True,
@@ -515,12 +505,14 @@ def EfficientNetB2(include_top=True,
                    pooling=None,
                    classes=1000,
                    **kwargs):
-    return EfficientNet(1.1, 1.2, 260, 0.3,
-                        model_name='efficientnet-b2',
-                        include_top=include_top, weights=weights,
-                        input_tensor=input_tensor, input_shape=input_shape,
-                        pooling=pooling, classes=classes,
-                        **kwargs)
+    return EfficientNet(
+        1.1, 1.2, 260, 0.3,
+        model_name='efficientnet-b2',
+        include_top=include_top, weights=weights,
+        input_tensor=input_tensor, input_shape=input_shape,
+        pooling=pooling, classes=classes,
+        **kwargs
+    )
 
 
 def EfficientNetB3(include_top=True,
@@ -530,72 +522,109 @@ def EfficientNetB3(include_top=True,
                    pooling=None,
                    classes=1000,
                    **kwargs):
-    return EfficientNet(1.2, 1.4, 300, 0.3,
-                        model_name='efficientnet-b3',
-                        include_top=include_top, weights=weights,
-                        input_tensor=input_tensor, input_shape=input_shape,
-                        pooling=pooling, classes=classes,
-                        **kwargs)
+    return EfficientNet(
+        1.2, 1.4, 300, 0.3,
+        model_name='efficientnet-b3',
+        include_top=include_top, weights=weights,
+        input_tensor=input_tensor, input_shape=input_shape,
+        pooling=pooling, classes=classes,
+        **kwargs
+    )
 
 
-def EfficientNetB4(include_top=True,
-                   weights='imagenet',
-                   input_tensor=None,
-                   input_shape=None,
-                   pooling=None,
-                   classes=1000,
-                   **kwargs):
-    return EfficientNet(1.4, 1.8, 380, 0.4,
-                        model_name='efficientnet-b4',
-                        include_top=include_top, weights=weights,
-                        input_tensor=input_tensor, input_shape=input_shape,
-                        pooling=pooling, classes=classes,
-                        **kwargs)
+def EfficientNetB4(
+        include_top=True,
+        weights='imagenet',
+        input_tensor=None,
+        input_shape=None,
+        pooling=None,
+        classes=1000,
+        **kwargs
+):
+    return EfficientNet(
+        1.4, 1.8, 380, 0.4,
+        model_name='efficientnet-b4',
+        include_top=include_top, weights=weights,
+        input_tensor=input_tensor, input_shape=input_shape,
+        pooling=pooling, classes=classes,
+        **kwargs
+    )
 
 
-def EfficientNetB5(include_top=True,
-                   weights='imagenet',
-                   input_tensor=None,
-                   input_shape=None,
-                   pooling=None,
-                   classes=1000,
-                   **kwargs):
-    return EfficientNet(1.6, 2.2, 456, 0.4,
-                        model_name='efficientnet-b5',
-                        include_top=include_top, weights=weights,
-                        input_tensor=input_tensor, input_shape=input_shape,
-                        pooling=pooling, classes=classes,
-                        **kwargs)
+def EfficientNetB5(
+        include_top=True,
+        weights='imagenet',
+        input_tensor=None,
+        input_shape=None,
+        pooling=None,
+        classes=1000,
+        **kwargs
+):
+    return EfficientNet(
+        1.6, 2.2, 456, 0.4,
+        model_name='efficientnet-b5',
+        include_top=include_top, weights=weights,
+        input_tensor=input_tensor, input_shape=input_shape,
+        pooling=pooling, classes=classes,
+        **kwargs
+    )
 
 
-def EfficientNetB6(include_top=True,
-                   weights='imagenet',
-                   input_tensor=None,
-                   input_shape=None,
-                   pooling=None,
-                   classes=1000,
-                   **kwargs):
-    return EfficientNet(1.8, 2.6, 528, 0.5,
-                        model_name='efficientnet-b6',
-                        include_top=include_top, weights=weights,
-                        input_tensor=input_tensor, input_shape=input_shape,
-                        pooling=pooling, classes=classes,
-                        **kwargs)
+def EfficientNetB6(
+        include_top=True,
+        weights='imagenet',
+        input_tensor=None,
+        input_shape=None,
+        pooling=None,
+        classes=1000,
+        **kwargs
+):
+    return EfficientNet(
+        1.8, 2.6, 528, 0.5,
+        model_name='efficientnet-b6',
+        include_top=include_top, weights=weights,
+        input_tensor=input_tensor, input_shape=input_shape,
+        pooling=pooling, classes=classes,
+        **kwargs
+    )
 
 
-def EfficientNetB7(include_top=True,
-                   weights='imagenet',
-                   input_tensor=None,
-                   input_shape=None,
-                   pooling=None,
-                   classes=1000,
-                   **kwargs):
-    return EfficientNet(2.0, 3.1, 600, 0.5,
-                        model_name='efficientnet-b7',
-                        include_top=include_top, weights=weights,
-                        input_tensor=input_tensor, input_shape=input_shape,
-                        pooling=pooling, classes=classes,
-                        **kwargs)
+def EfficientNetB7(
+        include_top=True,
+        weights='imagenet',
+        input_tensor=None,
+        input_shape=None,
+        pooling=None,
+        classes=1000,
+        **kwargs
+):
+    return EfficientNet(
+        2.0, 3.1, 600, 0.5,
+        model_name='efficientnet-b7',
+        include_top=include_top, weights=weights,
+        input_tensor=input_tensor, input_shape=input_shape,
+        pooling=pooling, classes=classes,
+        **kwargs
+    )
+
+
+def EfficientNetL2(
+        include_top=True,
+        weights='imagenet',
+        input_tensor=None,
+        input_shape=None,
+        pooling=None,
+        classes=1000,
+        **kwargs
+):
+    return EfficientNet(
+        4.3, 5.3, 800, 0.5,
+        model_name='efficientnet-l2',
+        include_top=include_top, weights=weights,
+        input_tensor=input_tensor, input_shape=input_shape,
+        pooling=pooling, classes=classes,
+        **kwargs
+    )
 
 
 def EfficientNetB8(include_top=True,
@@ -638,4 +667,3 @@ setattr(EfficientNetB6, '__doc__', EfficientNet.__doc__)
 setattr(EfficientNetB7, '__doc__', EfficientNet.__doc__)
 setattr(EfficientNetB8, '__doc__', EfficientNet.__doc__)
 setattr(EfficientNetL2, '__doc__', EfficientNet.__doc__)
-
