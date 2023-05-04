@@ -59,7 +59,7 @@ def inject_tfkeras_modules(func):
     return wrapper
 
 
-def init_keras_custom_objects():
+def init_tfkeras_custom_objects():
     import keras
     from . import model
 
