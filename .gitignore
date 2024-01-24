@@ -27,8 +27,6 @@ wheels/
 MANIFEST
 
 # PyInstaller
-#  Usually these files are written by a python script from a template
-#  before PyInstaller builds the exe, so as to inject date/other infos into it.
 *.manifest
 *.spec
 
@@ -103,3 +101,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Visual Studio (VS) Studio files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# End of file
